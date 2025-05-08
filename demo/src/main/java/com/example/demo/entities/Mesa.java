@@ -16,13 +16,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Data
 @Entity
 @Table(name = "mesas")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 public class Mesa {
 
     @Id
@@ -38,5 +36,4 @@ public class Mesa {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusMesa status = StatusMesa.LIVRE;
-
 }
