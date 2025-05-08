@@ -37,5 +37,6 @@ public class Mesa {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusMesa status;
+    private StatusMesa status = StatusMesa.LIVRE;
+
 }
