@@ -14,7 +14,9 @@ public interface ItensMapper {
 
     @Mapping(target = "id", ignore = true)
     ItemDeCardapio toEntity(CadastrarItensDto itensDto);
-    ListarItensDto tDto(ItemDeCardapio itemDeCardapio);
+
+    ListarItensDto toDto(ItemDeCardapio itemDeCardapio);
+    
     List<ListarItensDto> toDtoList(List<ItemDeCardapio> itemsDeCardapio);
 
 

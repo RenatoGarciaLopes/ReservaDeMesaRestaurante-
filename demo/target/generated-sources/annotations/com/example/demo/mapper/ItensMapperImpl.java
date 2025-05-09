@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-09T12:12:24-0300",
+    date = "2025-05-09T13:28:03-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
@@ -32,7 +32,7 @@ public class ItensMapperImpl implements ItensMapper {
     }
 
     @Override
-    public ListarItensDto tDto(ItemDeCardapio itemDeCardapio) {
+    public ListarItensDto toDto(ItemDeCardapio itemDeCardapio) {
         if ( itemDeCardapio == null ) {
             return null;
         }
@@ -54,7 +54,7 @@ public class ItensMapperImpl implements ItensMapper {
 
         List<ListarItensDto> list = new ArrayList<ListarItensDto>( itemsDeCardapio.size() );
         for ( ItemDeCardapio itemDeCardapio : itemsDeCardapio ) {
-            list.add( tDto( itemDeCardapio ) );
+            list.add( toDto( itemDeCardapio ) );
         }
 
         return list;
