@@ -1,7 +1,8 @@
-package com.example.demo.dto;
+package com.example.demo.dto.MesaDto;
 
 import com.example.demo.enums.StatusMesa;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Getter
-public class ListarMesaDto {
+public class AtualizarStatusMesaDto {
 
-    private Integer numero;
-    private Integer capacidade;
+    @NotNull(message = "O estado da mesa é obrigatório")
     private StatusMesa status;
 }

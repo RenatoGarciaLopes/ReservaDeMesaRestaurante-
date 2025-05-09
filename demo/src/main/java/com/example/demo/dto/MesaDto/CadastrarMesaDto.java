@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.MesaDto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

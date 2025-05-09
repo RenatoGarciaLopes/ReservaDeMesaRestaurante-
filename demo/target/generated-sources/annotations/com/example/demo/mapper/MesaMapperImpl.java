@@ -1,7 +1,7 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.CadastrarMesaDto;
-import com.example.demo.dto.ListarMesaDto;
+import com.example.demo.dto.MesaDto.CadastrarMesaDto;
+import com.example.demo.dto.MesaDto.ListarMesaDto;
 import com.example.demo.entities.Mesa;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-08T21:25:10-0300",
+    date = "2025-05-08T16:48:10-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
