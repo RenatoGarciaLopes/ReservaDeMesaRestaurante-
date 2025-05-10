@@ -31,12 +31,11 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true)
     @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_item")
+    @JoinColumn(name = "id_reserva")
     private Reserva reserva;
 
-    @OneToMany(mappedBy = "pedidos", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST)
     private List<PedidoItem> pedidoItens;
 
     @Column(nullable = false)

@@ -8,6 +8,6 @@ import com.example.demo.entities.Reserva;
 @Repository
 public interface IReservaRepository extends JpaRepository<Reserva, Long>{
 
-        
+    boolean existsByMesa_Id(Long idMesa);  
 
 }
