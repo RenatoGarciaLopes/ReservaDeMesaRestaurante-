@@ -77,10 +77,16 @@ public class MesaService {
     }
 
     public void removerMesa(Long id) {
+        if (!mesaRepository.existsById(id)) {
+            throw new EntityNotFoundException("Mesa não encontrada");
+        }
+
         boolean existe = reservaRepository.existsByMesa_Id(id);
 
-        if (!existe) {
-            mesaRepository.deleteById(id);
+        if (existe) {
+            throw new IllegalStateException("A mesa está associada a uma reserva e não pode ser removida.");
         }
+
+        mesaRepository.deleteById(id);
     }
 }
