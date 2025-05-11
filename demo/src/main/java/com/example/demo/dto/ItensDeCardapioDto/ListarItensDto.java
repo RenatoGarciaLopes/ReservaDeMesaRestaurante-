@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ListarItensDto {
 
+    private Long id;
     private String nome;
     private String descricao;
     private BigDecimal preco;
