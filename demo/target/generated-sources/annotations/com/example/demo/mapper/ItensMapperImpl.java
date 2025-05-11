@@ -1,7 +1,7 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.CadastrarItensDto;
-import com.example.demo.dto.ListarItensDto;
+import com.example.demo.dto.ItensDeCardapioDto.CadastrarItensDto;
+import com.example.demo.dto.ItensDeCardapioDto.ListarItensDto;
 import com.example.demo.entities.ItemDeCardapio;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-<<<<<<< HEAD
-    date = "2025-05-10T20:03:24-0300",
-=======
     date = "2025-05-11T12:10:28-0300",
->>>>>>> bb5baaf (ok)
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component

@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.ItensDeCardapioDto;
 
 import java.math.BigDecimal;
 
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Getter
-public class AtualizarItemDto {
+public class ListarItensDto {
 
     private String nome;
     private String descricao;
