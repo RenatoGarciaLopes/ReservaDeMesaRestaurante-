@@ -12,6 +12,7 @@ import com.example.demo.dto.PedidoDto.ListarItemPedidoDto;
 import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.entities.PedidoItem;
 import com.example.demo.entities.Reserva;
+import com.example.demo.enums.StatusReserva;
 import com.example.demo.repository.IItemDeCardapioRepository;
 import com.example.demo.repository.IReservaRepository;
 
@@ -28,8 +29,15 @@ public class PedidoMapperHelper {
 
     @Named("buscaReservaPorId")
     public Reserva buscaReservaPorId(Long reservaId) {
-        return reservaRepository.findById(reservaId)
+        Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        if (reserva.getStatus().equals(StatusReserva.CONCLUIDA)
+                || reserva.getStatus().equals(StatusReserva.CANCELADA)) {
+            throw new IllegalStateException("Uma reserva concluida ou cancelada não pode ser relacionada a um pedido.");
+        }
+
+        return reserva;
     }
 
     @Named("preparaPedidos")
