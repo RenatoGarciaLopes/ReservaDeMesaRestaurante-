@@ -16,6 +16,7 @@ import com.example.demo.repository.IMesaRepository;
 import com.example.demo.repository.IReservaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class MesaService {
@@ -29,6 +30,7 @@ public class MesaService {
     @Autowired
     private MesaMapper mesaMapper;
 
+    @Transactional
     public ListarMesaDto salvar(CadastrarMesaDto mesaDto) {
         Mesa mesa = mesaMapper.toEntity(mesaDto);
         return mesaMapper.toDto(mesaRepository.save(mesa));
@@ -53,6 +55,7 @@ public class MesaService {
         return mesaMapper.toDto(mesa);
     }
 
+    @Transactional
     public ListarMesaDto atualizarMesa(Long id, AtualizarMesaDto mesaDto) {
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
@@ -67,6 +70,7 @@ public class MesaService {
         return mesaMapper.toDto(mesaRepository.save(mesa));
     }
 
+    @Transactional
     public ListarMesaDto atualizarStatusMesa(Long id, AtualizarStatusMesaDto mesaDto) {
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
@@ -76,6 +80,7 @@ public class MesaService {
         return mesaMapper.toDto(mesaRepository.save(mesa));
     }
 
+    @Transactional
     public void removerMesa(Long id) {
         if (!mesaRepository.existsById(id)) {
             throw new EntityNotFoundException("Mesa não encontrada");

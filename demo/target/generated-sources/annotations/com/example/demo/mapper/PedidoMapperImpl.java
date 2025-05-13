@@ -6,20 +6,25 @@ import com.example.demo.entities.Cliente;
 import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Pedido;
 import com.example.demo.entities.Reserva;
+import com.example.demo.mapper.Utils.PedidoMapperHelper;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-12T20:34:17-0300",
+    date = "2025-05-13T09:53:13-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.z20250331-1358, environment: Java 21.0.6 (Eclipse Adoptium)"
 )
 @Component
-public class PedidoMapperImpl extends PedidoMapper {
+public class PedidoMapperImpl implements PedidoMapper {
+
+    @Autowired
+    private PedidoMapperHelper pedidoMapperHelper;
 
     @Override
     public Pedido toEntity(CadastrarPedidoDto pedidoDto) {
@@ -29,10 +34,9 @@ public class PedidoMapperImpl extends PedidoMapper {
 
         Pedido pedido = new Pedido();
 
-        pedido.setPedidoItens( preparaPedidos( pedidoDto.getPedidos() ) );
-        pedido.setValorTotal( calculaTotal( pedidoDto.getPedidos() ) );
-
-        pedido.setReserva( reservaRepository.getReferenceById(pedidoDto.getReserva_id()) );
+        pedido.setReserva( pedidoMapperHelper.buscaReservaPorId( pedidoDto.getReserva_id() ) );
+        pedido.setPedidoItens( pedidoMapperHelper.preparaPedidos( pedidoDto.getPedidos() ) );
+        pedido.setValorTotal( pedidoMapperHelper.calculaTotal( pedidoDto.getPedidos() ) );
 
         verificaStatusReserva( pedido );
         afterMapping( pedido, pedidoDto );
@@ -52,7 +56,7 @@ public class PedidoMapperImpl extends PedidoMapper {
         listarPedidoDto.setDataReserva( pedidoReservaDataReserva( pedido ) );
         listarPedidoDto.setHoraReserva( pedidoReservaHoraReserva( pedido ) );
         listarPedidoDto.setNomeCliente( pedidoReservaClienteNome( pedido ) );
-        listarPedidoDto.setPedidos( convertePedidos( pedido.getPedidoItens() ) );
+        listarPedidoDto.setPedidos( pedidoMapperHelper.convertePedidos( pedido.getPedidoItens() ) );
         listarPedidoDto.setValorTotal( pedido.getValorTotal() );
 
         return listarPedidoDto;

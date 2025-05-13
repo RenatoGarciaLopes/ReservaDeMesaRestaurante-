@@ -9,9 +9,11 @@ import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
 import com.example.demo.entities.Pedido;
 import com.example.demo.mapper.PedidoMapper;
+import com.example.demo.repository.IPedidoItemRepository;
 import com.example.demo.repository.IPedidoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoService {
@@ -20,8 +22,12 @@ public class PedidoService {
     private IPedidoRepository pedidoRepository;
 
     @Autowired
+    private IPedidoItemRepository pedidoItemRepository;
+
+    @Autowired
     private PedidoMapper pedidoMapper;
 
+    @Transactional
     public ListarPedidoDto salvar(CadastrarPedidoDto pedidoDto) {
         Pedido pedido = pedidoMapper.toEntity(pedidoDto);
         return pedidoMapper.toDto(pedidoRepository.save(pedido));
@@ -43,5 +49,16 @@ public class PedidoService {
                 .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
 
         return pedidoMapper.toDto(pedido);
+    }
+
+    @Transactional
+    public void removerPedido(Long id) {
+        if (!pedidoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Pedido não encontrado");
+        }
+
+        pedidoItemRepository.deleteAllByPedido_Id(id);
+
+        pedidoRepository.deleteById(id);
     }
 }
