@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.example.demo.dto.ItensDeCardapioDto.AtualizarItemDto;
 import com.example.demo.dto.ItensDeCardapioDto.CadastrarItensDto;
@@ -11,9 +12,12 @@ import com.example.demo.dto.ItensDeCardapioDto.ListarItensDto;
 import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.mapper.ItensMapper;
 import com.example.demo.repository.IItemDeCardapioRepository;
+import com.example.demo.repository.IPedidoItemRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
+@Validated
 @Service
 public class ItensService {
 
@@ -21,9 +25,12 @@ public class ItensService {
     private IItemDeCardapioRepository itemRepository;
 
     @Autowired
+    private IPedidoItemRepository pedidoItemRepository;
+
+    @Autowired
     private ItensMapper itemMapper;
 
-    public ListarItensDto salvar(CadastrarItensDto itensDto){
+    public ListarItensDto salvar(@Valid CadastrarItensDto itensDto){
         ItemDeCardapio item = itemMapper.toEntity(itensDto);
         return itemMapper.toDto(itemRepository.save(item));
     }
@@ -65,6 +72,13 @@ public class ItensService {
         if(!itemRepository.existsById(id)){
             throw new EntityNotFoundException("Item não encontrado");
         }
+
+        boolean existe = pedidoItemRepository.existsByItem_Id(id);
+
+        if (existe) {
+            throw new IllegalStateException("O item está associado a um pedido e não pode ser removido.");
+        }
+
         itemRepository.deleteById(id);
     }
 
