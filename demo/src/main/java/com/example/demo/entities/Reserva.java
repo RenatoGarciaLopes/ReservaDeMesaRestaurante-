@@ -32,11 +32,11 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    
     @ManyToOne(cascade = CascadeType.ALL)
     private Cliente cliente;
 
-    @Column(nullable = false)
+    
     @ManyToOne(cascade = CascadeType.ALL)
     private Mesa mesa;
 
