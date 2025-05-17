@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import com.example.demo.enums.StatusReserva;
 
 import jakarta.annotation.Generated;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,12 +34,10 @@ public class Reserva {
 
     @Column(nullable = false)
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
     @Column(nullable = false)
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_mesa")
     private Mesa mesa;
 
     @Column(nullable = false)
