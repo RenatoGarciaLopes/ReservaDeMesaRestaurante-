@@ -34,10 +34,12 @@ public class Reserva {
 
     
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
     
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_mesa")
     private Mesa mesa;
 
     @Column(nullable = false)
