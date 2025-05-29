@@ -26,6 +26,5 @@ public class CadastrarReservaDTO {
     private LocalDateTime dataReserva;
 
     @NotNull(message = "Hora Obrigatoria")
-    @FutureOrPresent
     private LocalTime horaReserva;
 }
