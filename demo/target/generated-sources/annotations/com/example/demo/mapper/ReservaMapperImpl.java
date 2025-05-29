@@ -2,19 +2,26 @@ package com.example.demo.mapper;
 
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
+import com.example.demo.entities.Cliente;
+import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Reserva;
+import com.example.demo.mapper.Utils.ReservaMapperHelper;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-28T23:34:33-0300",
+    date = "2025-05-29T15:23:47-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class ReservaMapperImpl implements ReservaMapper {
+
+    @Autowired
+    private ReservaMapperHelper reservaMapperHelper;
 
     @Override
     public Reserva toEntity(CadastrarReservaDTO reservaDTO) {
@@ -24,6 +31,8 @@ public class ReservaMapperImpl implements ReservaMapper {
 
         Reserva reserva = new Reserva();
 
+        reserva.setCliente( reservaMapperHelper.buscarCliente( reservaDTO.getClienteId() ) );
+        reserva.setMesa( reservaMapperHelper.buscarMesa( reservaDTO.getMesaId() ) );
         reserva.setDataReserva( reservaDTO.getDataReserva() );
         reserva.setHoraReserva( reservaDTO.getHoraReserva() );
 
@@ -38,6 +47,8 @@ public class ReservaMapperImpl implements ReservaMapper {
 
         ListarReservaDto listarReservaDto = new ListarReservaDto();
 
+        listarReservaDto.setNomeCliente( reservaClienteNome( reserva ) );
+        listarReservaDto.setNumeroMesa( reservaMesaNumero( reserva ) );
         listarReservaDto.setDataReserva( reserva.getDataReserva() );
         listarReservaDto.setHoraReserva( reserva.getHoraReserva() );
         listarReservaDto.setStatus( reserva.getStatus() );
@@ -57,5 +68,35 @@ public class ReservaMapperImpl implements ReservaMapper {
         }
 
         return list;
+    }
+
+    private String reservaClienteNome(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Cliente cliente = reserva.getCliente();
+        if ( cliente == null ) {
+            return null;
+        }
+        String nome = cliente.getNome();
+        if ( nome == null ) {
+            return null;
+        }
+        return nome;
+    }
+
+    private Integer reservaMesaNumero(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Mesa mesa = reserva.getMesa();
+        if ( mesa == null ) {
+            return null;
+        }
+        Integer numero = mesa.getNumero();
+        if ( numero == null ) {
+            return null;
+        }
+        return numero;
     }
 }
