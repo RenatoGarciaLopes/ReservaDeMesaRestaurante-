@@ -12,6 +12,7 @@ import com.example.demo.dto.ClienteDto.ListarClienteDto;
 import com.example.demo.entities.Cliente;
 import com.example.demo.mapper.ClienteMapper;
 import com.example.demo.repository.IClienteRepository;
+import com.example.demo.repository.IReservaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -22,6 +23,9 @@ public class ClienteService {
 
     @Autowired
     private IClienteRepository clienteRepository;
+
+    @Autowired
+    private IReservaRepository reservaRepository;
 
     @Autowired
     private ClienteMapper clienteMapper;
@@ -67,7 +71,7 @@ public class ClienteService {
             throw new EntityNotFoundException("Cliente não encontrado");
         }
 
-        boolean existe = clienteRepository.existsById(id);
+        boolean existe = reservaRepository.existsByCliente_Id(id);
 
         if (existe) {
             throw new IllegalStateException("O cliente tem uma reserva no restaurante, ele não pode ser removido");

@@ -9,4 +9,5 @@ import com.example.demo.entities.Reserva;
 public interface IReservaRepository extends JpaRepository<Reserva, Long>{
 
     boolean existsByMesa_Id(Long idMesa);  
+    boolean existsByCliente_Id(Long idCliente);
 }
