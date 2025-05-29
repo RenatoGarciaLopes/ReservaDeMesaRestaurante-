@@ -21,6 +21,6 @@ public class CadastroClienteDto{
     private String email;
 
     @NotBlank(message = "O telefone é obrigatorio")
-    @Size(min = 11, max = 12, message = "siga o padrão a seguir:'44 99999999'" )
+    @Size(min = 11, max = 12, message = "O número de telefone deve conter entre 11 e 12 dígitos, seguindo o padrão: '44 999999999'" )
     private String telefone;
 }
