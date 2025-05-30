@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse("Operação inválida", er.getMessage());
         ApiResponse<ErrorResponse> response = new ApiResponse<>(error);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     public record DataErrors(String field, String message) {
