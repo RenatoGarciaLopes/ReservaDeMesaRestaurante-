@@ -1,7 +1,6 @@
 package com.example.demo.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +22,7 @@ public class CadastrarReservaDTO {
 
     @NotNull(message = "Data Obrigatoria")
     @FutureOrPresent
-    private LocalDateTime dataReserva;
+    private LocalDate dataReserva;
 
     @NotNull(message = "Hora Obrigatoria")
     private LocalTime horaReserva;

@@ -1,11 +1,10 @@
 package com.example.demo.entities;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.example.demo.enums.StatusReserva;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +42,7 @@ public class Reserva {
     private Mesa mesa;
 
     @Column(nullable = false)
-    private LocalDateTime dataReserva;
+    private LocalDate dataReserva;
 
     @Column(nullable = false)
     private LocalTime horaReserva;
