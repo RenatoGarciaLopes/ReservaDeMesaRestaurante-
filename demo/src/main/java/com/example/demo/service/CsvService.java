@@ -34,7 +34,6 @@ public class CsvService<T> {
             csvWriter.write(respList);
             writer.flush();
         } catch (Exception e) {
-            e.printStackTrace(); // para diagnosticar
             throw new RuntimeException("Exceção ao exportar arquivo CSV", e);
         }
     }

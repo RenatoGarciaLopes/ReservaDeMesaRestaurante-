@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
+import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
 import com.example.demo.entities.Pedido;
 import com.example.demo.mapper.PedidoMapper;
 import com.example.demo.repository.IPedidoItemRepository;
@@ -60,5 +62,19 @@ public class PedidoService {
         pedidoItemRepository.deleteAllByPedido_Id(id);
 
         pedidoRepository.deleteById(id);
+    }
+
+    public List<PedidoExportacaoCsvDto> convertePedidosCsv() {
+        return listarPedidos().stream()
+                .flatMap(pedido -> pedido.getPedidos().stream().map(item -> new PedidoExportacaoCsvDto(
+                        pedido.getNumeroMesa(),
+                        pedido.getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        pedido.getHoraReserva(),
+                        pedido.getNomeCliente(),
+                        item.getNomeItem(),
+                        item.getQuantidade(),
+                        item.getSubTotal(),
+                        pedido.getValorTotal())))
+                .toList();
     }
 }

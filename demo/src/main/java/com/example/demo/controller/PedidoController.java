@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -95,22 +93,12 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Exportar pedidos em csv", description = "Exporta pedidos por mesa para um arquivo csv")
+    @Operation(summary = "Exportar pedidos em csv", description = "Exporta pedidos por mesa para arquivo csv")
     @GetMapping("/exportar")
     public ResponseEntity<Void> exportarArquivoCSV(HttpServletResponse response)
             throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException, URISyntaxException {
         String fileName = "pedidos-por-mesa.csv";
-        List<PedidoExportacaoCsvDto> requestList = pedidoService.listarPedidos().stream()
-                .flatMap(pedido -> pedido.getPedidos().stream().map(item -> new PedidoExportacaoCsvDto(
-                        pedido.getNumeroMesa(),
-                        pedido.getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        pedido.getHoraReserva(),
-                        pedido.getNomeCliente(),
-                        item.getNomeItem(),
-                        item.getQuantidade(),
-                        item.getSubTotal(),
-                        pedido.getValorTotal())))
-                .toList();
+        List<PedidoExportacaoCsvDto> requestList = pedidoService.convertePedidosCsv();
 
         csvService.exportCsv(fileName, response, requestList, PedidoExportacaoCsvDto.class);
 
