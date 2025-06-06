@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
+import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
+import com.example.demo.service.CsvService;
 import com.example.demo.service.PedidoService;
 import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Tag(name = "Pedidos", description = "Endpoints para gerenciamento de pedidos")
@@ -30,6 +39,9 @@ public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private CsvService csvService;
 
     @Operation(summary = "Criar Pedido", description = "Registra um novo pedido")
     @PostMapping
@@ -81,5 +93,27 @@ public class PedidoController {
         pedidoService.removerPedido(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Exportar pedidos em csv", description = "Exporta pedidos por mesa para um arquivo csv")
+    @GetMapping("/exportar")
+    public ResponseEntity<Void> exportarArquivoCSV(HttpServletResponse response)
+            throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException, URISyntaxException {
+        String fileName = "pedidos-por-mesa.csv";
+        List<PedidoExportacaoCsvDto> requestList = pedidoService.listarPedidos().stream()
+                .flatMap(pedido -> pedido.getPedidos().stream().map(item -> new PedidoExportacaoCsvDto(
+                        pedido.getNumeroMesa(),
+                        pedido.getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        pedido.getHoraReserva(),
+                        pedido.getNomeCliente(),
+                        item.getNomeItem(),
+                        item.getQuantidade(),
+                        item.getSubTotal(),
+                        pedido.getValorTotal())))
+                .toList();
+
+        csvService.exportCsv(fileName, response, requestList, PedidoExportacaoCsvDto.class);
+
+        return ResponseEntity.ok().build();
     }
 }

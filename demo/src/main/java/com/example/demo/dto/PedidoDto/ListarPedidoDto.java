@@ -1,7 +1,7 @@
 package com.example.demo.dto.PedidoDto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ListarPedidoDto {
 
     private Integer numeroMesa;
-    private LocalDateTime dataReserva;
+    private LocalDate dataReserva;
     private LocalTime horaReserva;
     private String nomeCliente;
     private List<ListarItemPedidoDto> pedidos;

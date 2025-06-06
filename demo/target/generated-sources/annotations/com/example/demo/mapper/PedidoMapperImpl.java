@@ -7,23 +7,17 @@ import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Pedido;
 import com.example.demo.entities.Reserva;
 import com.example.demo.mapper.Utils.PedidoMapperHelper;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-
+    date = "2025-06-06T08:28:57-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -31,16 +25,6 @@ public class PedidoMapperImpl implements PedidoMapper {
 
     @Autowired
     private PedidoMapperHelper pedidoMapperHelper;
-    private final DatatypeFactory datatypeFactory;
-
-    public PedidoMapperImpl() {
-        try {
-            datatypeFactory = DatatypeFactory.newInstance();
-        }
-        catch ( DatatypeConfigurationException ex ) {
-            throw new RuntimeException( ex );
-        }
-    }
 
     @Override
     public Pedido toEntity(CadastrarPedidoDto pedidoDto) {
@@ -68,7 +52,7 @@ public class PedidoMapperImpl implements PedidoMapper {
         ListarPedidoDto listarPedidoDto = new ListarPedidoDto();
 
         listarPedidoDto.setNumeroMesa( pedidoReservaMesaNumero( pedido ) );
-        listarPedidoDto.setDataReserva( xmlGregorianCalendarToLocalDateTime( localDateToXmlGregorianCalendar( pedidoReservaDataReserva( pedido ) ) ) );
+        listarPedidoDto.setDataReserva( pedidoReservaDataReserva( pedido ) );
         listarPedidoDto.setHoraReserva( pedidoReservaHoraReserva( pedido ) );
         listarPedidoDto.setNomeCliente( pedidoReservaClienteNome( pedido ) );
         listarPedidoDto.setPedidos( pedidoMapperHelper.convertePedidos( pedido.getPedidoItens() ) );
@@ -89,64 +73,6 @@ public class PedidoMapperImpl implements PedidoMapper {
         }
 
         return list;
-    }
-
-    private XMLGregorianCalendar localDateToXmlGregorianCalendar( LocalDate localDate ) {
-        if ( localDate == null ) {
-            return null;
-        }
-
-        return datatypeFactory.newXMLGregorianCalendarDate(
-            localDate.getYear(),
-            localDate.getMonthValue(),
-            localDate.getDayOfMonth(),
-            DatatypeConstants.FIELD_UNDEFINED );
-    }
-
-    private static LocalDateTime xmlGregorianCalendarToLocalDateTime( XMLGregorianCalendar xcal ) {
-        if ( xcal == null ) {
-            return null;
-        }
-
-        if ( xcal.getYear() != DatatypeConstants.FIELD_UNDEFINED
-            && xcal.getMonth() != DatatypeConstants.FIELD_UNDEFINED
-            && xcal.getDay() != DatatypeConstants.FIELD_UNDEFINED
-            && xcal.getHour() != DatatypeConstants.FIELD_UNDEFINED
-            && xcal.getMinute() != DatatypeConstants.FIELD_UNDEFINED
-        ) {
-            if ( xcal.getSecond() != DatatypeConstants.FIELD_UNDEFINED
-                && xcal.getMillisecond() != DatatypeConstants.FIELD_UNDEFINED ) {
-                return LocalDateTime.of(
-                    xcal.getYear(),
-                    xcal.getMonth(),
-                    xcal.getDay(),
-                    xcal.getHour(),
-                    xcal.getMinute(),
-                    xcal.getSecond(),
-                    Duration.ofMillis( xcal.getMillisecond() ).getNano()
-                );
-            }
-            else if ( xcal.getSecond() != DatatypeConstants.FIELD_UNDEFINED ) {
-                return LocalDateTime.of(
-                    xcal.getYear(),
-                    xcal.getMonth(),
-                    xcal.getDay(),
-                    xcal.getHour(),
-                    xcal.getMinute(),
-                    xcal.getSecond()
-                );
-            }
-            else {
-                return LocalDateTime.of(
-                    xcal.getYear(),
-                    xcal.getMonth(),
-                    xcal.getDay(),
-                    xcal.getHour(),
-                    xcal.getMinute()
-                );
-            }
-        }
-        return null;
     }
 
     private Integer pedidoReservaMesaNumero(Pedido pedido) {
