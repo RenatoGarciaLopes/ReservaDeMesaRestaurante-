@@ -69,7 +69,7 @@ public class PedidoService {
                 .flatMap(pedido -> pedido.getPedidos().stream().map(item -> new PedidoExportacaoCsvDto(
                         pedido.getNumeroMesa(),
                         pedido.getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        pedido.getHoraReserva(),
+                        pedido.getHoraReserva().format(DateTimeFormatter.ofPattern("HH:mm")),
                         pedido.getNomeCliente(),
                         item.getNomeItem(),
                         item.getQuantidade(),

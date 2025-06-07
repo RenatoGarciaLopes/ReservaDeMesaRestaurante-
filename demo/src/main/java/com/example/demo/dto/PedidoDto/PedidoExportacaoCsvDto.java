@@ -1,7 +1,6 @@
 package com.example.demo.dto.PedidoDto;
 
 import java.math.BigDecimal;
-import java.time.LocalTime;
 
 import com.opencsv.bean.CsvBindByName;
 
@@ -23,7 +22,7 @@ public class PedidoExportacaoCsvDto {
     private String dataReserva;
 
     @CsvBindByName(column = "Hora da Reserva")
-    private LocalTime horaReserva;
+    private String horaReserva;
 
     @CsvBindByName(column = "Nome do Cliente")
     private String nomeCliente;
