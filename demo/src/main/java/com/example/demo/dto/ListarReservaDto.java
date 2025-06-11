@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.example.demo.enums.StatusReserva;
@@ -16,7 +16,7 @@ public class ListarReservaDto {
 
     private String nomeCliente;
     private Integer numeroMesa;
-    private LocalDateTime dataReserva;
+    private LocalDate dataReserva;
     private LocalTime horaReserva;
     private StatusReserva status;
 

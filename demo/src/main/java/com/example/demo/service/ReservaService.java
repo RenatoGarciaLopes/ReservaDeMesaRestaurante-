@@ -33,16 +33,18 @@ public class ReservaService {
 
     @Transactional
     public ListarReservaDto salvar(CadastrarReservaDTO DTO) {
-        boolean existe = reservaRepository.findAll().stream()
-                .filter(r -> r.getDataReserva().equals(DTO.getDataReserva()))
-                .anyMatch(r -> r.getHoraReserva().equals(DTO.getHoraReserva()));
-
-        if (existe) {
-            throw new IllegalStateException("Escolha outro horário ou data");
-        }
-
         Mesa mesa = mesaRepository.findById(DTO.getMesaId())
                 .orElseThrow(() -> new EntityNotFoundException("Mesa nao existe"));
+
+        if (reservaRepository.existsByMesa_Id(DTO.getMesaId()) && mesa.getStatus().equals(StatusMesa.RESERVADA)) {
+            boolean existe = reservaRepository.findAll().stream()
+                    .filter(r -> r.getDataReserva().equals(DTO.getDataReserva()))
+                    .anyMatch(r -> r.getHoraReserva().equals(DTO.getHoraReserva()));
+
+            if (existe) {
+                throw new IllegalStateException("Escolha outro horário ou data");
+            }
+        }
 
         mesa.setStatus(StatusMesa.RESERVADA);
         mesaRepository.save(mesa);
@@ -70,6 +72,8 @@ public class ReservaService {
     public ListarReservaDto atualizarStatusReserva(Long id, AtualizarStatusReservaDto reservaDto) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        reserva.setStatus(reservaDto.getStatus());
 
         if (reserva.getStatus().equals(StatusReserva.CANCELADA)
                 || reserva.getStatus().equals(StatusReserva.CONCLUIDA)) {
