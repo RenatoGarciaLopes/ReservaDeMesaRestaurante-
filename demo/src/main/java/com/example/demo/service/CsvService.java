@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class CsvService<T> {
 
-    public <T> void exportCsv(String fileName, HttpServletResponse response, List<T> respList, Class<T> reqClass)
+    public void exportCsv(String fileName, HttpServletResponse response, List<T> respList, Class<T> reqClass)
             throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
         response.setContentType("text/csv; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");

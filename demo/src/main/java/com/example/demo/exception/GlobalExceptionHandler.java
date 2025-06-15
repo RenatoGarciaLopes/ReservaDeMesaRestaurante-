@@ -44,6 +44,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException er) {
+        ErrorResponse error = new ErrorResponse("Argumento inválido", er.getMessage());
+        ApiResponse<ErrorResponse> response = new ApiResponse<>(error);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     public record DataErrors(String field, String message) {
 
         public DataErrors(FieldError error) {

@@ -18,6 +18,6 @@ public class ListarReservaDto {
     private Integer numeroMesa;
     private LocalDate dataReserva;
     private LocalTime horaReserva;
+    private Integer quantidadePessoas;
     private StatusReserva status;
-
 }

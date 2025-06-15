@@ -23,20 +23,20 @@ import lombok.Setter;
 @Data
 @Entity
 @Table(name = "reservas")
-@Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
-    
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_mesa")
     private Mesa mesa;
@@ -48,6 +48,8 @@ public class Reserva {
     private LocalTime horaReserva;
 
     @Column(nullable = false)
-    private StatusReserva status = StatusReserva.CONFIRMADA;
+    private Integer quantidadePessoas;
 
+    @Column(nullable = false)
+    private StatusReserva status = StatusReserva.CONFIRMADA;
 }

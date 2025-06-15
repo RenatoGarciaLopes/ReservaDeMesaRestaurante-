@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-11T19:20:21-0300",
+    date = "2025-06-14T20:20:45-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -35,6 +35,7 @@ public class ReservaMapperImpl implements ReservaMapper {
         reserva.setMesa( reservaMapperHelper.buscarMesa( reservaDTO.getMesaId() ) );
         reserva.setDataReserva( reservaDTO.getDataReserva() );
         reserva.setHoraReserva( reservaDTO.getHoraReserva() );
+        reserva.setQuantidadePessoas( reservaDTO.getQuantidadePessoas() );
 
         return reserva;
     }
@@ -51,6 +52,7 @@ public class ReservaMapperImpl implements ReservaMapper {
         listarReservaDto.setNumeroMesa( reservaMesaNumero( reserva ) );
         listarReservaDto.setDataReserva( reserva.getDataReserva() );
         listarReservaDto.setHoraReserva( reserva.getHoraReserva() );
+        listarReservaDto.setQuantidadePessoas( reserva.getQuantidadePessoas() );
         listarReservaDto.setStatus( reserva.getStatus() );
 
         return listarReservaDto;

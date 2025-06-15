@@ -1,6 +1,10 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,32 +35,48 @@ public class ReservaService {
     @Autowired
     private IMesaRepository mesaRepository;
 
+    @Autowired
+    private HorarioFuncionamentoService horarioFuncionamentoService;
+
     @Transactional
-    public ListarReservaDto salvar(CadastrarReservaDTO DTO) {
-        Mesa mesa = mesaRepository.findById(DTO.getMesaId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa nao existe"));
+    public ListarReservaDto salvar(CadastrarReservaDTO Dto) {
+        Mesa mesa = mesaRepository.findById(Dto.getMesaId())
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
 
-        if (reservaRepository.existsByMesa_Id(DTO.getMesaId()) && mesa.getStatus().equals(StatusMesa.RESERVADA)) {
-            boolean existe = reservaRepository.findAll().stream()
-                    .filter(r -> r.getDataReserva().equals(DTO.getDataReserva()))
-                    .anyMatch(r -> r.getHoraReserva().equals(DTO.getHoraReserva()));
+        Set<LocalTime> horarios = new HashSet<>(
+                horarioFuncionamentoService.gerarHorariosReserva(Dto.getDataReserva().getDayOfWeek()));
 
-            if (existe) {
-                throw new IllegalStateException("Escolha outro horário ou data");
-            }
+        if (!horarios.contains(Dto.getHoraReserva()))
+            throw new IllegalStateException("Horário indisponível: tente outro horário");
+
+        if (Dto.getDataReserva().isEqual(LocalDate.now()) &&
+                Dto.getHoraReserva().isBefore(LocalTime.now())) {
+            throw new IllegalStateException("Horário inválido: não é possível reservar para um horário que já passou");
         }
+
+        boolean e = reservaRepository.findAll().stream()
+                .filter(r -> r.getDataReserva().equals(Dto.getDataReserva()))
+                .filter(r -> r.getHoraReserva().equals(Dto.getHoraReserva()))
+                .filter(r -> r.getMesa().getNumero().equals(mesa.getNumero()))
+                .anyMatch(r -> r.getStatus() == StatusReserva.CONFIRMADA);
+
+        if (e)
+            throw new IllegalStateException("Horário indisponível: tente outra data ou horário");
+
+        if (mesa.getCapacidade() < Dto.getQuantidadePessoas())
+            throw new IllegalStateException(
+                    "A quantidade de pessoas excede a capacidade da mesa selecionada. Selecione outra mesa ou reduza o número de pessoas.");
 
         mesa.setStatus(StatusMesa.RESERVADA);
         mesaRepository.save(mesa);
 
-        Reserva reserva = reservaRepository.save(reservaMapper.toEntity(DTO));
+        Reserva reserva = reservaRepository.save(reservaMapper.toEntity(Dto));
         return reservaMapper.toDto(reserva);
-
     }
 
     public ListarReservaDto obterReservaPorId(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva nao encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
 
         return reservaMapper.toDto(reserva);
     }
@@ -78,7 +98,7 @@ public class ReservaService {
         if (reserva.getStatus().equals(StatusReserva.CANCELADA)
                 || reserva.getStatus().equals(StatusReserva.CONCLUIDA)) {
             Mesa mesa = mesaRepository.findById(reserva.getMesa().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mesa nao existe"));
+                    .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
 
             mesa.setStatus(StatusMesa.LIVRE);
             mesaRepository.save(mesa);
@@ -100,7 +120,7 @@ public class ReservaService {
         reservaRepository.save(reserva);
 
         Mesa mesa = mesaRepository.findById(reserva.getMesa().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa nao existe"));
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
 
         mesa.setStatus(StatusMesa.LIVRE);
         mesaRepository.save(mesa);
