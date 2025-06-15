@@ -1,8 +1,11 @@
 package com.example.demo.dto.ClienteDto;
 
+import com.example.demo.validation.CpfValido;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,17 +13,22 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Getter
+public class CadastroClienteDto {
 
-public class CadastroClienteDto{
-    
-    @NotBlank(message = "O nome é obrigatorio")
+    @NotBlank(message = "O nome é obrigatório")
     private String nome;
 
-    @NotBlank(message = "O email é obrigado")
+    @NotBlank(message = "O CPF é obrigatório")
+    @CpfValido
+    private String cpf;
+
     @Email
     private String email;
 
-    @NotBlank(message = "O telefone é obrigatorio")
-    @Size(min = 11, max = 12, message = "O número de telefone deve conter entre 11 e 12 dígitos, seguindo o padrão: '44 999999999'" )
+    @NotBlank(message = "O telefone é obrigatório")
+    @Schema(example = "(XX) XXXX-XXXX ou (XX) 9XXXX-XXXX")
+    @Pattern(regexp = "\\(\\d{2}\\) (?:\\d{4,5})-\\d{4}", message = "Formato inválido. Use (XX) XXXX-XXXX ou (XX) 9XXXX-XXXX")
     private String telefone;
+
+    private String observacoes;
 }

@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 public class ListarReservaDto {
 
     private String nomeCliente;
+    private String cpf;
+    private String telefone;
     private Integer numeroMesa;
     private LocalDate dataReserva;
     private LocalTime horaReserva;

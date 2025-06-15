@@ -20,6 +20,8 @@ public interface ReservaMapper {
     
     //pegar o objeto Reserva e transforma em DTO
     @Mapping(target = "nomeCliente", source = "cliente.nome")
+    @Mapping(target = "cpf", source = "cliente.cpf")
+    @Mapping(target = "telefone", source = "cliente.telefone")
     @Mapping(target = "numeroMesa", source = "mesa.numero")
     ListarReservaDto toDto(Reserva reserva);
 

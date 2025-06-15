@@ -3,6 +3,7 @@ package com.example.demo.entities;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,12 @@ public class HorarioFuncionamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private DayOfWeek diaFuncionamento;
+
+    @Column(nullable = false)
     private LocalTime horarioInicio;
+
+    @Column(nullable = false)
     private LocalTime horarioFim;
 }

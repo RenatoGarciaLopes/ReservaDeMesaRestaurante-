@@ -15,8 +15,6 @@ public class IntervaloHorarioValidator
         LocalTime inicio = value.getHorarioInicio();
         LocalTime fim = value.getHorarioFim();
 
-        if(fim.equals(LocalTime.MIDNIGHT)) return true;
-
         return fim.isAfter(inicio);
     }
 }

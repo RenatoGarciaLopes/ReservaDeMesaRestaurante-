@@ -75,6 +75,8 @@ public class PedidoMapperHelper {
 
                     dto.setNomeItem(pedido.getItem().getNome());
                     dto.setQuantidade(pedido.getQuantidade());
+                    dto.setImagemUrl(pedido.getItem().getImagemUrl());
+                    dto.setCategoria(pedido.getItem().getCategoria().getNome());
                     dto.setSubTotal(pedido.getItem().getPreco().multiply(BigDecimal.valueOf(pedido.getQuantidade())));
 
                     return dto;

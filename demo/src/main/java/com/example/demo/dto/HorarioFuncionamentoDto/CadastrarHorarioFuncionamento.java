@@ -16,10 +16,12 @@ public class CadastrarHorarioFuncionamento {
 
     @NotNull(message = "Dia da semana é obrigatório")
     private DayOfWeek diaFuncionamento;
+
     @Schema(type = "string", example = "00:00", pattern = "HH:mm")
     @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "Hora de início de funcionamento é obrigatório")
     private LocalTime horarioInicio;
+    
     @Schema(type = "string", example = "00:00", pattern = "HH:mm")
     @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "Hora de fim de funcioanemnto é obrigatório")

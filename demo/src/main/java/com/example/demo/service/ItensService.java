@@ -9,8 +9,10 @@ import org.springframework.validation.annotation.Validated;
 import com.example.demo.dto.ItensDeCardapioDto.AtualizarItemDto;
 import com.example.demo.dto.ItensDeCardapioDto.CadastrarItensDto;
 import com.example.demo.dto.ItensDeCardapioDto.ListarItensDto;
+import com.example.demo.entities.Categoria;
 import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.mapper.ItensMapper;
+import com.example.demo.repository.ICategoriaRepository;
 import com.example.demo.repository.IItemDeCardapioRepository;
 import com.example.demo.repository.IPedidoItemRepository;
 
@@ -28,34 +30,36 @@ public class ItensService {
     private IPedidoItemRepository pedidoItemRepository;
 
     @Autowired
+    private ICategoriaRepository categoriaRepository;
+
+    @Autowired
     private ItensMapper itemMapper;
 
-    public ListarItensDto salvar(@Valid CadastrarItensDto itensDto){
+    public ListarItensDto salvar(@Valid CadastrarItensDto itensDto) {
         ItemDeCardapio item = itemMapper.toEntity(itensDto);
         return itemMapper.toDto(itemRepository.save(item));
     }
 
-    public List<ListarItensDto> listarItens(){
+    public List<ListarItensDto> listarItens() {
         return itemMapper.toDtoList(itemRepository.findAll());
     }
 
-    public ListarItensDto obterItemPeloId(Long id){
+    public ListarItensDto obterItemPeloId(Long id) {
         ItemDeCardapio item = itemRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Item não encontrado"));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Item não foi encontrado"));
+
         return itemMapper.toDto(item);
     }
 
-
-    public ListarItensDto atualizarItem(Long id, AtualizarItemDto itemDto){
+    public ListarItensDto atualizarItem(Long id, AtualizarItemDto itemDto) {
         ItemDeCardapio item = itemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Item não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Item não foi encontrado"));
 
-        if(itemDto.getDescricao() != null){
+        if (itemDto.getDescricao() != null) {
             item.setDescricao(itemDto.getDescricao());
         }
 
-        if(itemDto.getNome() != null){
+        if (itemDto.getNome() != null) {
             item.setNome(itemDto.getNome());
         }
 
@@ -63,14 +67,23 @@ public class ItensService {
             item.setPreco(itemDto.getPreco());
         }
 
-        return itemMapper.toDto(itemRepository.save(item));
+        if (itemDto.getImagemUrl() != null) {
+            item.setImagemUrl(itemDto.getImagemUrl());
+        }
 
+        if (itemDto.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Categoria não foi encontrado"));
+
+            item.setCategoria(categoria);
+        }
+
+        return itemMapper.toDto(itemRepository.save(item));
     }
 
-
-    public void removerItem(Long id){
-        if(!itemRepository.existsById(id)){
-            throw new EntityNotFoundException("Item não encontrado");
+    public void removerItem(Long id) {
+        if (!itemRepository.existsById(id)) {
+            throw new EntityNotFoundException("Item não foi encontrado");
         }
 
         boolean existe = pedidoItemRepository.existsByItem_Id(id);
@@ -81,5 +94,4 @@ public class ItensService {
 
         itemRepository.deleteById(id);
     }
-
 }

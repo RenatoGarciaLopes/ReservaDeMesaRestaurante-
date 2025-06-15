@@ -8,6 +8,4 @@ import com.example.demo.entities.ItemDeCardapio;
 @Repository
 public interface IItemDeCardapioRepository extends JpaRepository<ItemDeCardapio, Long>{
 
-
-
 }

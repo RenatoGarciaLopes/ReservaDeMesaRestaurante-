@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-14T20:20:45-0300",
+    date = "2025-06-15T01:19:03-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -49,6 +49,8 @@ public class ReservaMapperImpl implements ReservaMapper {
         ListarReservaDto listarReservaDto = new ListarReservaDto();
 
         listarReservaDto.setNomeCliente( reservaClienteNome( reserva ) );
+        listarReservaDto.setCpf( reservaClienteCpf( reserva ) );
+        listarReservaDto.setTelefone( reservaClienteTelefone( reserva ) );
         listarReservaDto.setNumeroMesa( reservaMesaNumero( reserva ) );
         listarReservaDto.setDataReserva( reserva.getDataReserva() );
         listarReservaDto.setHoraReserva( reserva.getHoraReserva() );
@@ -85,6 +87,36 @@ public class ReservaMapperImpl implements ReservaMapper {
             return null;
         }
         return nome;
+    }
+
+    private String reservaClienteCpf(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Cliente cliente = reserva.getCliente();
+        if ( cliente == null ) {
+            return null;
+        }
+        String cpf = cliente.getCpf();
+        if ( cpf == null ) {
+            return null;
+        }
+        return cpf;
+    }
+
+    private String reservaClienteTelefone(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Cliente cliente = reserva.getCliente();
+        if ( cliente == null ) {
+            return null;
+        }
+        String telefone = cliente.getTelefone();
+        if ( telefone == null ) {
+            return null;
+        }
+        return telefone;
     }
 
     private Integer reservaMesaNumero(Reserva reserva) {

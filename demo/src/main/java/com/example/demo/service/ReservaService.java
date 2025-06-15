@@ -9,7 +9,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.AtualizarStatusReservaDto;
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
 import com.example.demo.entities.Mesa;
@@ -88,31 +87,44 @@ public class ReservaService {
                 .toList();
     }
 
-    @Transactional
-    public ListarReservaDto atualizarStatusReserva(Long id, AtualizarStatusReservaDto reservaDto) {
-        Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
-
-        reserva.setStatus(reservaDto.getStatus());
-
-        if (reserva.getStatus().equals(StatusReserva.CANCELADA)
-                || reserva.getStatus().equals(StatusReserva.CONCLUIDA)) {
-            Mesa mesa = mesaRepository.findById(reserva.getMesa().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
-
-            mesa.setStatus(StatusMesa.LIVRE);
-            mesaRepository.save(mesa);
-        }
-
-        return reservaMapper.toDto(reservaRepository.save(reserva));
-    }
-
     public List<ListarReservaDto> listarReserva() {
         return reservaMapper.toListDtos(reservaRepository.findAll());
     }
 
     @Transactional
-    public void removerReserva(Long id) {
+    public ListarReservaDto confirmarChegadaReserva(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        if (!reserva.getStatus().equals(StatusReserva.CONFIRMADA)) {
+            throw new IllegalStateException("Apenas reservas confirmadas podem ser marcadas como ocupadas");
+        }
+
+        Mesa mesa = reserva.getMesa();
+
+        mesa.setStatus(StatusMesa.OCUPADO);
+        mesaRepository.save(mesa);
+
+        return reservaMapper.toDto(reserva);
+    }
+
+    @Transactional
+    public ListarReservaDto concluirReserva(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        Mesa mesa = reserva.getMesa();
+
+        reserva.setStatus(StatusReserva.CONCLUIDA);
+        mesa.setStatus(StatusMesa.LIVRE);
+
+        mesaRepository.save(mesa);
+
+        return reservaMapper.toDto(reservaRepository.save(reserva));
+    }
+
+    @Transactional
+    public ListarReservaDto cancelarReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
 
@@ -124,5 +136,7 @@ public class ReservaService {
 
         mesa.setStatus(StatusMesa.LIVRE);
         mesaRepository.save(mesa);
+
+        return reservaMapper.toDto(reserva);
     }
 }

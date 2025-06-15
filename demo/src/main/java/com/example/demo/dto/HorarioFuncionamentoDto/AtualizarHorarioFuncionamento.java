@@ -13,6 +13,7 @@ public class AtualizarHorarioFuncionamento {
     @Schema(type = "string", example = "00:00", pattern = "HH:mm")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horarioInicio;
+    
     @Schema(type = "string", example = "00:00", pattern = "HH:mm")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horarioFim;

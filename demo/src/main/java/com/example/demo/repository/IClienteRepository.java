@@ -8,6 +8,4 @@ import com.example.demo.entities.Cliente;
 @Repository
 public interface IClienteRepository extends JpaRepository<Cliente, Long>{
 
-
-
 }

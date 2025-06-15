@@ -2,19 +2,25 @@ package com.example.demo.mapper;
 
 import com.example.demo.dto.ItensDeCardapioDto.CadastrarItensDto;
 import com.example.demo.dto.ItensDeCardapioDto.ListarItensDto;
+import com.example.demo.entities.Categoria;
 import com.example.demo.entities.ItemDeCardapio;
+import com.example.demo.mapper.Utils.ItemHelperMapper;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-14T19:32:39-0300",
+    date = "2025-06-15T00:51:24-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class ItensMapperImpl implements ItensMapper {
+
+    @Autowired
+    private ItemHelperMapper itemHelperMapper;
 
     @Override
     public ItemDeCardapio toEntity(CadastrarItensDto itensDto) {
@@ -24,7 +30,9 @@ public class ItensMapperImpl implements ItensMapper {
 
         ItemDeCardapio itemDeCardapio = new ItemDeCardapio();
 
+        itemDeCardapio.setCategoria( itemHelperMapper.buscaReservaPorId( itensDto.getCategoriaId() ) );
         itemDeCardapio.setDescricao( itensDto.getDescricao() );
+        itemDeCardapio.setImagemUrl( itensDto.getImagemUrl() );
         itemDeCardapio.setNome( itensDto.getNome() );
         itemDeCardapio.setPreco( itensDto.getPreco() );
 
@@ -39,8 +47,10 @@ public class ItensMapperImpl implements ItensMapper {
 
         ListarItensDto listarItensDto = new ListarItensDto();
 
+        listarItensDto.setCategoria( itemDeCardapioCategoriaNome( itemDeCardapio ) );
         listarItensDto.setDescricao( itemDeCardapio.getDescricao() );
         listarItensDto.setId( itemDeCardapio.getId() );
+        listarItensDto.setImagemUrl( itemDeCardapio.getImagemUrl() );
         listarItensDto.setNome( itemDeCardapio.getNome() );
         listarItensDto.setPreco( itemDeCardapio.getPreco() );
 
@@ -59,5 +69,20 @@ public class ItensMapperImpl implements ItensMapper {
         }
 
         return list;
+    }
+
+    private String itemDeCardapioCategoriaNome(ItemDeCardapio itemDeCardapio) {
+        if ( itemDeCardapio == null ) {
+            return null;
+        }
+        Categoria categoria = itemDeCardapio.getCategoria();
+        if ( categoria == null ) {
+            return null;
+        }
+        String nome = categoria.getNome();
+        if ( nome == null ) {
+            return null;
+        }
+        return nome;
     }
 }
