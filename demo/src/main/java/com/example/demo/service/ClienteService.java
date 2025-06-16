@@ -42,14 +42,21 @@ public class ClienteService {
 
     public ListarClienteDto obterClientePeloId(long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
+
+        return clienteMapper.toDto(cliente);
+    }
+
+    public ListarClienteDto obterClientePeloCpf(String cpf) {
+        Cliente cliente = clienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
 
         return clienteMapper.toDto(cliente);
     }
 
     public ListarClienteDto atualizarCliente(Long id, AtualizarClienteDto clienteDto) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
 
         if (clienteDto.getNome() != null) {
             cliente.setNome(clienteDto.getNome());
@@ -72,7 +79,7 @@ public class ClienteService {
 
     public void removerCliente(Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new EntityNotFoundException("Cliente não encontrado");
+            throw new EntityNotFoundException("Cliente não foi encontrado");
         }
 
         boolean existe = reservaRepository.existsByCliente_Id(id);

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ClienteDto.AtualizarClienteDto;
@@ -59,6 +60,13 @@ public class ClienteController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarClienteDto>> obterClientePeloId(@PathVariable long id) {
         ListarClienteDto cliente = clienteService.obterClientePeloId(id);
+        return ResponseEntity.ok(new ApiResponse<>(cliente));
+    }
+
+    @Operation(summary = "Buscar Cliente por CPF", description = "Busca um cliente por CPF")
+    @GetMapping("/buscar")
+    public ResponseEntity<ApiResponse<ListarClienteDto>> buscarPorCpf(@RequestParam String cpf) {
+        ListarClienteDto cliente = clienteService.obterClientePeloCpf(cpf);
         return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
