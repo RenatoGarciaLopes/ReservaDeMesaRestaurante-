@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.example.demo.dto.HorarioFuncionamentoDto.AtualizarHorarioFuncionament
 import com.example.demo.dto.HorarioFuncionamentoDto.CadastrarHorarioFuncionamento;
 import com.example.demo.dto.HorarioFuncionamentoDto.ListarHorarioFuncionamento;
 import com.example.demo.entities.HorarioFuncionamento;
+import com.example.demo.enums.DiaSemanaPortugues;
 import com.example.demo.mapper.HorarioFuncionamentoMapper;
 import com.example.demo.repository.IHorarioFuncionamentoRepository;
 
@@ -29,6 +31,13 @@ public class HorarioFuncionamentoService {
 
     @Transactional
     public ListarHorarioFuncionamento cadastrar(CadastrarHorarioFuncionamento dto) {
+        Optional<HorarioFuncionamento> existeDia = horarioFuncionamentoRepository
+                .findByDiaFuncionamento(DiaSemanaPortugues.from(dto.getDiaFuncionamento()).toDayOfWeek());
+
+        if (existeDia.isPresent()) {
+            throw new IllegalStateException("Este dia da semana já foi cadastrado.");
+        }
+
         HorarioFuncionamento horarioFuncionamento = horarioFuncionamentoMapper.toEntity(dto);
         return horarioFuncionamentoMapper.toDto(horarioFuncionamentoRepository.save(horarioFuncionamento));
     }

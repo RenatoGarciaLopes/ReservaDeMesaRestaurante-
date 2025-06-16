@@ -17,8 +17,8 @@ public class AtualizarClienteDto {
     @Email
     private String email;
 
-    @Schema(example = "(XX) XXXX-XXXX ou (XX) 9XXXX-XXXX")
-    @Pattern(regexp = "\\(\\d{2}\\) (?:\\d{4,5})-\\d{4}", message = "Formato inválido. Use (XX) XXXX-XXXX ou (XX) 9XXXX-XXXX")
+    @Schema(example = "(XX)XXXXXXXX ou (XX)9XXXX-XXXX")
+    @Pattern(regexp = "\\(\\d{2}\\)?:\\d{4,5})\\d{4}", message = "Formato inválido. Use (XX)XXXX-XXXX ou (XX)9XXXX-XXXX")
     private String telefone;
 
     private String observacoes;
