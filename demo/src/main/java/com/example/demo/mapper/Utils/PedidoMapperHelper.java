@@ -62,7 +62,7 @@ public class PedidoMapperHelper {
                     ItemDeCardapio item = itemDeCardapioRepository.findById(dto.getItemId())
                             .orElseThrow(() -> new EntityNotFoundException("Item de cardápio não encontrado."));
 
-                    return item.getPreco().multiply(BigDecimal.valueOf(dto.getQuantidade()));
+                    return (BigDecimal) item.getPreco().multiply(BigDecimal.valueOf(dto.getQuantidade()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

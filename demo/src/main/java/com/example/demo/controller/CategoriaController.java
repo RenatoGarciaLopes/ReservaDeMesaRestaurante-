@@ -5,11 +5,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CategoriaDto.CadastrarCategoriaDto;
@@ -36,32 +40,55 @@ public class CategoriaController {
             @RequestBody @Valid CadastrarCategoriaDto dto) {
         try {
             ListarCategoriaDto savedCategoria = categoriaService.salvar(dto);
-            ApiResponse<ListarCategoriaDto> response = new ApiResponse<>(savedCategoria);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedCategoria));
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarCategoriaDto> response = new ApiResponse<>(errorResponse);
-
+            ApiResponse<ListarCategoriaDto> response = new ApiResponse<>(new ErrorResponse("Erro interno", e.getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    @Operation(summary = "Listar Categorias", description = "Lista todas as categorias")
+    @Operation(summary = "Listar Categorias")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarCategoriaDto>>> listarCategorias() {
-        List<ListarCategoriaDto> categorias = categoriaService.listarCliente();
-        ApiResponse<List<ListarCategoriaDto>> response = new ApiResponse<>(categorias);
+    public ResponseEntity<ApiResponse<List<ListarCategoriaDto>>> listarCategorias(
+            @RequestParam(required = false) Boolean ativo) {
 
-        return ResponseEntity.ok(response);
+        List<ListarCategoriaDto> categorias;
+
+        if (ativo == null) {
+            categorias = categoriaService.listarTodasCategorias();
+        } else {
+            categorias = categoriaService.listarCategoriasPorStatus(ativo);
+        }
+
+        return ResponseEntity.ok(new ApiResponse<>(categorias));
     }
 
     @Operation(summary = "Obter Categoria por ID", description = "Obtém uma categoria específica pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarCategoriaDto>> obterMesaPeloId(@PathVariable Long id) {
         ListarCategoriaDto categoria = categoriaService.obterCategoriaPeloId(id);
-        ApiResponse<ListarCategoriaDto> response = new ApiResponse<>(categoria);
+        return ResponseEntity.ok(new ApiResponse<>(categoria));
+    }
 
-        return ResponseEntity.ok(response);
+    @Operation(summary = "Atualizar Categoria", description = "Atualiza os dados de uma categoria")
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ListarCategoriaDto>> atualizarCategoria(@PathVariable Long id,
+            @RequestBody @Valid CadastrarCategoriaDto dto) {
+        ListarCategoriaDto categoria = categoriaService.atualizarCategoria(id, dto);
+        return ResponseEntity.ok(new ApiResponse<>(categoria));
+    }
+
+    @Operation(summary = "Inativa Categoria", description = "Inativa uma categoria")
+    @DeleteMapping("{id}/inativar")
+    public ResponseEntity<ApiResponse<String>> inativarCategoria(@PathVariable Long id) {
+        categoriaService.inativarCategoria(id);
+        return ResponseEntity.ok(new ApiResponse<>("Categoria inativada com sucesso"));
+    }
+
+    @Operation(summary = "Ativar Categoria", description = "Reativa uma categoria inativa")
+    @PatchMapping("{id}/ativar")
+    public ResponseEntity<ApiResponse<String>> ativarCategoria(@PathVariable Long id) {
+        categoriaService.reativarCategoria(id);
+        return ResponseEntity.ok(new ApiResponse<>("Categoria ativada com sucesso"));
     }
 }

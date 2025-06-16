@@ -39,13 +39,10 @@ public class HorarioFuncionamentoController {
             @RequestBody @Valid CadastrarHorarioFuncionamento dto) {
         try {
             ListarHorarioFuncionamento savedHorarioFuncionamento = horarioFuncionamentoService.cadastrar(dto);
-            ApiResponse<ListarHorarioFuncionamento> response = new ApiResponse<>(savedHorarioFuncionamento);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedHorarioFuncionamento));
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarHorarioFuncionamento> response = new ApiResponse<>(errorResponse);
-
+            ApiResponse<ListarHorarioFuncionamento> response = new ApiResponse<>(
+                    new ErrorResponse("Erro interno", e.getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -54,18 +51,14 @@ public class HorarioFuncionamentoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ListarHorarioFuncionamento>>> listarMesas() {
         List<ListarHorarioFuncionamento> horarios = horarioFuncionamentoService.listarHorarios();
-        ApiResponse<List<ListarHorarioFuncionamento>> response = new ApiResponse<>(horarios);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(horarios));
     }
 
     @Operation(summary = "Obter Horário por ID", description = "Obtém informações dos horários de um dia específico pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarHorarioFuncionamento>> obterMesaPeloId(@PathVariable Long id) {
         ListarHorarioFuncionamento horario = horarioFuncionamentoService.obterHorarioPorId(id);
-        ApiResponse<ListarHorarioFuncionamento> response = new ApiResponse<>(horario);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(horario));
     }
 
     @Operation(summary = "Atualizar Horário de Funcionamento", description = "Atualiza os dados de um dia de funcionamento")
@@ -73,15 +66,13 @@ public class HorarioFuncionamentoController {
     public ResponseEntity<ApiResponse<ListarHorarioFuncionamento>> atualizarHorario(@PathVariable Long id,
             @RequestBody AtualizarHorarioFuncionamento dto) {
         ListarHorarioFuncionamento mesa = horarioFuncionamentoService.atualizarHorario(id, dto);
-        ApiResponse<ListarHorarioFuncionamento> response = new ApiResponse<>(mesa);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesa));
     }
 
     @Operation(summary = "Remover Horário de Funcionamento", description = "Remove um dia de funcionamento do sistema pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerMesa(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> removerMesa(@PathVariable Long id) {
         horarioFuncionamentoService.removerHorario(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Horário de funcionamento removido com sucesso."));
     }
 }

@@ -20,9 +20,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFound(EntityNotFoundException er) {
         ErrorResponse error = new ErrorResponse("Recurso não encontrado", er.getMessage());
-        ApiResponse<ErrorResponse> response = new ApiResponse<>(error);
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(error));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -39,17 +37,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> handleIllegalState(IllegalStateException er) {
         ErrorResponse error = new ErrorResponse("Operação inválida", er.getMessage());
-        ApiResponse<ErrorResponse> response = new ApiResponse<>(error);
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse<>(error));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException er) {
         ErrorResponse error = new ErrorResponse("Argumento inválido", er.getMessage());
-        ApiResponse<ErrorResponse> response = new ApiResponse<>(error);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(error));
     }
 
     public record DataErrors(String field, String message) {

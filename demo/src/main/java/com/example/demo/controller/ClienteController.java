@@ -22,7 +22,6 @@ import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -41,13 +40,11 @@ public class ClienteController {
             @RequestBody @Valid CadastroClienteDto clienteDto) {
         try {
             ListarClienteDto savedCliente = clienteService.salvar(clienteDto);
-            ApiResponse<ListarClienteDto> response = new ApiResponse<>(savedCliente);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedCliente));
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarClienteDto> response = new ApiResponse<>(errorResponse);
+            ApiResponse<ListarClienteDto> response = new ApiResponse<>(
+                    new ErrorResponse("Erro interno", e.getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
         }
     }
 
@@ -55,33 +52,28 @@ public class ClienteController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ListarClienteDto>>> listarClientes() {
         List<ListarClienteDto> cliente = clienteService.listarCliente();
-        ApiResponse<List<ListarClienteDto>> response = new ApiResponse<>(cliente);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
     @Operation(summary = "Obter Cliente por ID", description = "Obtém infotmações de um cliente específico pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarClienteDto>> obterClientePeloId(@PathVariable long id) {
         ListarClienteDto cliente = clienteService.obterClientePeloId(id);
-        ApiResponse<ListarClienteDto> response = new ApiResponse<>(cliente);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
     @Operation(summary = "Atualizar Cliente", description = "Atualizar dados do cliente")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarClienteDto>> atualizarCliente(@PathVariable long id, @RequestBody @Valid AtualizarClienteDto clienteDto){
+    public ResponseEntity<ApiResponse<ListarClienteDto>> atualizarCliente(@PathVariable long id,
+            @RequestBody @Valid AtualizarClienteDto clienteDto) {
         ListarClienteDto cliente = clienteService.atualizarCliente(id, clienteDto);
-        ApiResponse<ListarClienteDto> response = new ApiResponse<>(cliente);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
-    @Operation(summary = "Remover Cliente", description = "Remove um cliemte do sistema pelo ID, desde que não tenha reservas associadas")
+    @Operation(summary = "Remover Cliente", description = "Remove um cliente do sistema pelo ID, desde que não tenha reservas associadas")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerCliente(@PathVariable long id) {
+    public ResponseEntity<ApiResponse<String>> removerCliente(@PathVariable long id) {
         clienteService.removerCliente(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Cliente removido com sucesso."));
     }
 }

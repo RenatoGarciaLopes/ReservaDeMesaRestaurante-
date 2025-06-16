@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Itens de cardapio", description = "Endpoints de gererenciamento de itens de cardapio" )
+@Tag(name = "Itens de cardapio", description = "Endpoints de gererenciamento de itens de cardapio")
 @RestController
 @RequestMapping("api/itens")
 public class ItemDeCardapioController {
@@ -35,57 +35,43 @@ public class ItemDeCardapioController {
 
     @Operation(summary = "Adicionar Item no cardapio", description = "Cadastra um novo item")
     @PostMapping
-    public ResponseEntity<ApiResponse<ListarItensDto>> criarItem(@RequestBody @Valid CadastrarItensDto itemDto){
+    public ResponseEntity<ApiResponse<ListarItensDto>> criarItem(@RequestBody @Valid CadastrarItensDto itemDto) {
         try {
             ListarItensDto savedItem = itensService.salvar(itemDto);
-            ApiResponse<ListarItensDto> response = new ApiResponse<>(savedItem);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedItem));
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarItensDto> response = new ApiResponse<>(errorResponse);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(errorResponse));
         }
     }
-    
+
     @Operation(summary = "Listar itens de cardapio", description = "Lista todos os itens no cardapio")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarItensDto>>> listarItens(){
+    public ResponseEntity<ApiResponse<List<ListarItensDto>>> listarItens() {
         List<ListarItensDto> itens = itensService.listarItens();
-        ApiResponse<List<ListarItensDto>> response = new ApiResponse<>(itens);
-        return ResponseEntity.ok(response);
-
+        return ResponseEntity.ok(new ApiResponse<>(itens));
     }
 
     @Operation(summary = "Listar item por id", description = "Obtem informações de um item do cardapio especifico pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarItensDto>> obterItemPeloId(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<ListarItensDto>> obterItemPeloId(@PathVariable Long id) {
         ListarItensDto item = itensService.obterItemPeloId(id);
-        ApiResponse<ListarItensDto> response = new ApiResponse<>(item);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(item));
     }
-    
+
     @Operation(summary = "Atualizar item", description = "Atualiza os dados de um item em especifico")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarItensDto>> atualizarItens(@PathVariable Long id, 
-            @RequestBody @Valid AtualizarItemDto itemDto){
-
-    
+    public ResponseEntity<ApiResponse<ListarItensDto>> atualizarItens(@PathVariable Long id,
+            @RequestBody @Valid AtualizarItemDto itemDto) {
         ListarItensDto item = itensService.atualizarItem(id, itemDto);
-        ApiResponse<ListarItensDto> response = new ApiResponse<>(item);
-
-        return ResponseEntity.ok(response);
-
+        return ResponseEntity.ok(new ApiResponse<>(item));
     }
 
-    @Operation(summary = "Remover item de cardapio",description = "remove um item do cardapio pelo ID")
+    @Operation(summary = "Remover item de cardápio", description = "remove um item do cardápio pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerItem(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<String>> removerItem(@PathVariable Long id) {
         itensService.removerItem(id);
-            
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new ApiResponse<>("Item do cardápio removido com sucesso"));
     }
 }

@@ -38,14 +38,10 @@ public class ReservaController {
             @RequestBody @Valid CadastrarReservaDTO reservaDTO) {
         try {
             ListarReservaDto savedReservaDto = reservaService.salvar(reservaDTO);
-            ApiResponse<ListarReservaDto> response = new ApiResponse<>(savedReservaDto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedReservaDto));
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarReservaDto> response = new ApiResponse<>(errorResponse);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(errorResponse));
         }
     }
 
@@ -53,9 +49,7 @@ public class ReservaController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ListarReservaDto>>> listarReservas() {
         List<ListarReservaDto> reservaDtos = reservaService.listarReserva();
-        ApiResponse<List<ListarReservaDto>> response = new ApiResponse<>(reservaDtos);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(reservaDtos));
     }
 
     @Operation(summary = "Listar Reserva por Cliente", description = "Listar as reservas por clientes")
@@ -63,44 +57,34 @@ public class ReservaController {
     public ResponseEntity<ApiResponse<List<ListarReservaDto>>> listarReservaPorCliente(
             @PathVariable Long clienteId) {
         List<ListarReservaDto> reservaDtos = reservaService.listarReservaPorCliente(clienteId);
-        ApiResponse<List<ListarReservaDto>> response = new ApiResponse<>(reservaDtos);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(reservaDtos));
     }
 
     @Operation(summary = "Obter reserva por ID", description = "Obter a reserva por ID especifico")
     @GetMapping("{id}")
     public ResponseEntity<ApiResponse<ListarReservaDto>> obterReservaPorId(@PathVariable Long id) {
         ListarReservaDto dto = reservaService.obterReservaPorId(id);
-        ApiResponse<ListarReservaDto> response = new ApiResponse<>(dto);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(dto));
     }
 
     @Operation(summary = "Confirmar chegada do cliente", description = "Atualiza o status da mesa para 'OCUPADA'")
     @PatchMapping("{id}/confirmar")
     public ResponseEntity<ApiResponse<ListarReservaDto>> confirmarChegada(@PathVariable Long id) {
         ListarReservaDto reserva = reservaService.confirmarChegadaReserva(id);
-        ApiResponse<ListarReservaDto> response = new ApiResponse<>(reserva);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(reserva));
     }
 
     @Operation(summary = "Concluir reserva", description = "Atualiza o status da reserva para 'CONCLUÍDA' e libera a mesa (status 'LIVRE')")
     @PatchMapping("{id}/concluir")
     public ResponseEntity<ApiResponse<ListarReservaDto>> concluirReserva(@PathVariable Long id) {
         ListarReservaDto reserva = reservaService.concluirReserva(id);
-        ApiResponse<ListarReservaDto> response = new ApiResponse<>(reserva);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(reserva));
     }
 
     @Operation(summary = "Cancelar Reserva", description = "Atualiza o status da reserva para 'CANCELADA' e libera a mesa (status 'LIVRE')")
     @DeleteMapping("{id}/cancelar")
     public ResponseEntity<ApiResponse<ListarReservaDto>> cancelarReserva(@PathVariable Long id) {
         ListarReservaDto reserva = reservaService.cancelarReserva(id);
-        ApiResponse<ListarReservaDto> response = new ApiResponse<>(reserva);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(reserva));
     }
 }

@@ -40,14 +40,10 @@ public class MesaController {
     public ResponseEntity<ApiResponse<ListarMesaDto>> criarMesa(@RequestBody @Valid CadastrarMesaDto mesaDto) {
         try {
             ListarMesaDto savedMesa = mesaService.salvar(mesaDto);
-            ApiResponse<ListarMesaDto> response = new ApiResponse<>(savedMesa);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedMesa));
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarMesaDto> response = new ApiResponse<>(errorResponse);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(errorResponse));
         }
     }
 
@@ -55,27 +51,21 @@ public class MesaController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesas() {
         List<ListarMesaDto> mesas = mesaService.listarMesas();
-        ApiResponse<List<ListarMesaDto>> response = new ApiResponse<>(mesas);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesas));
     }
 
     @Operation(summary = "Listar Mesas Disponíveis", description = "Lista mesas com status 'Livre'")
     @GetMapping("/disponiveis")
     public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesasDisponiveis() {
         List<ListarMesaDto> mesas = mesaService.listarMesasDisponiveis();
-        ApiResponse<List<ListarMesaDto>> response = new ApiResponse<>(mesas);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesas));
     }
 
     @Operation(summary = "Obter Mesa por ID", description = "Obtém informações de uma mesa específica pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarMesaDto>> obterMesaPeloId(@PathVariable Long id) {
         ListarMesaDto mesa = mesaService.obterMesaPeloId(id);
-        ApiResponse<ListarMesaDto> response = new ApiResponse<>(mesa);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesa));
     }
 
     @Operation(summary = "Atualizar Mesa", description = "Atualiza os dados de uma mesa")
@@ -83,9 +73,7 @@ public class MesaController {
     public ResponseEntity<ApiResponse<ListarMesaDto>> atualizarMesa(@PathVariable Long id,
             @RequestBody @Valid AtualizarMesaDto mesaDto) {
         ListarMesaDto mesa = mesaService.atualizarMesa(id, mesaDto);
-        ApiResponse<ListarMesaDto> response = new ApiResponse<>(mesa);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesa));
     }
 
     @Operation(summary = "Alterar Status da Mesa", description = "Modifica o status de uma mesa para Livre, Ocupada ou Reservada")
@@ -93,15 +81,13 @@ public class MesaController {
     public ResponseEntity<ApiResponse<ListarMesaDto>> atualizarStatusMesa(@PathVariable Long id,
             @RequestBody @Valid AtualizarStatusMesaDto mesaDto) {
         ListarMesaDto mesa = mesaService.atualizarStatusMesa(id, mesaDto);
-        ApiResponse<ListarMesaDto> response = new ApiResponse<>(mesa);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(mesa));
     }
 
     @Operation(summary = "Remover Mesa", description = "Remove uma mesa do sistema pelo ID, desde que não tenha reservas associadas")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removerMesa(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> removerMesa(@PathVariable Long id) {
         mesaService.removerMesa(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Mesa removida com sucesso."));
     }
 }
