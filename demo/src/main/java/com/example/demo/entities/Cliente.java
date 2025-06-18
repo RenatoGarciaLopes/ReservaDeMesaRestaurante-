@@ -36,4 +36,7 @@ public class Cliente {
 
    @Column(columnDefinition = "TEXT")
    private String observacoes;
+
+   @Column(nullable = false)
+   private boolean ativo = true;
 }

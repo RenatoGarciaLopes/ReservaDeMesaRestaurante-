@@ -40,6 +40,10 @@ public class ClienteService {
         return clienteMapper.toDtoLIst(clienteRepository.findAll());
     }
 
+    public List<ListarClienteDto> listarClientePorStatus(Boolean status) {
+        return clienteMapper.toDtoLIst(clienteRepository.findByAtivo(status));
+    }
+
     public ListarClienteDto obterClientePeloId(long id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
@@ -48,7 +52,8 @@ public class ClienteService {
     }
 
     public ListarClienteDto obterClientePeloCpf(String cpf) {
-        Cliente cliente = clienteRepository.findByCpf(cpf)
+        String cpfLimpo = cpf.replaceAll("\\D", "");
+        Cliente cliente = clienteRepository.findByCpf(cpfLimpo)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
 
         return clienteMapper.toDto(cliente);
@@ -77,18 +82,23 @@ public class ClienteService {
         return clienteMapper.toDto(clienteRepository.save(cliente));
     }
 
-    public void removerCliente(Long id) {
-        if (!clienteRepository.existsById(id)) {
-            throw new EntityNotFoundException("Cliente não foi encontrado");
+    public void inativarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
+
+        cliente.setAtivo(false);
+        clienteRepository.save(cliente);
+    }
+
+    public void reativarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
+
+        if (cliente.getStatus() == true) {
+            throw new IllegalStateException("Cliente já está ativo");
         }
 
-        boolean existe = reservaRepository.existsByCliente_Id(id);
-
-        if (existe) {
-            throw new IllegalStateException("O cliente tem uma reserva no restaurante, ele não pode ser removido");
-
-        }
-
-        clienteRepository.deleteById(id);
+        cliente.setAtivo(true);
+        clienteRepository.save(cliente);
     }
 }

@@ -40,6 +40,10 @@ public class MesaService {
         return mesaMapper.toDtoLIst(mesaRepository.findAll());
     }
 
+    public List<ListarMesaDto> listarMesasPorStatus(Boolean status) {
+        return mesaMapper.toDtoLIst(mesaRepository.findByAtivo(status));
+    }
+
     public List<ListarMesaDto> listarMesasDisponiveis() {
         List<Mesa> mesasDisponiveis = mesaRepository.findAll().stream()
                 .filter(m -> m.getStatus().equals(StatusMesa.LIVRE))
@@ -81,17 +85,24 @@ public class MesaService {
     }
 
     @Transactional
-    public void removerMesa(Long id) {
-        if (!mesaRepository.existsById(id)) {
-            throw new EntityNotFoundException("Mesa não encontrada");
+    public void inativarMesa(Long id) {
+        Mesa mesa = mesaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+
+        mesa.setAtivo(false);
+        mesaRepository.save(mesa);
+    }
+
+    @Transactional
+    public void reativarMesa(Long id) {
+        Mesa mesa = mesaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+
+        if (mesa.getAtivo() == true) {
+            throw new IllegalStateException("Mesa já está ativa");
         }
 
-        boolean existe = reservaRepository.existsByMesa_Id(id);
-
-        if (existe) {
-            throw new IllegalStateException("A mesa está associada a uma reserva e não pode ser removida.");
-        }
-
-        mesaRepository.deleteById(id);
+        mesa.setAtivo(true);
+        mesaRepository.save(mesa);
     }
 }

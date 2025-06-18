@@ -10,6 +10,9 @@ import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
 import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
 import com.example.demo.entities.Pedido;
+import com.example.demo.entities.Reserva;
+import com.example.demo.enums.StatusPedido;
+import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.PedidoMapper;
 import com.example.demo.repository.IPedidoItemRepository;
 import com.example.demo.repository.IPedidoRepository;
@@ -31,6 +34,14 @@ public class PedidoService {
 
     @Transactional
     public ListarPedidoDto salvar(CadastrarPedidoDto pedidoDto) {
+        Reserva reserva = reservaRepository.findById(pedidoDto.getReserva_id())
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+        if (reserva.getStatus().equals(StatusReserva.CONCLUIDA)
+                || reserva.getStatus().equals(StatusReserva.CANCELADA)) {
+            throw new IllegalStateException("Uma reserva concluida ou cancelada não pode ser relacionada a um pedido.");
+        }
+
         Pedido pedido = pedidoMapper.toEntity(pedidoDto);
         return pedidoMapper.toDto(pedidoRepository.save(pedido));
     }
@@ -54,14 +65,12 @@ public class PedidoService {
     }
 
     @Transactional
-    public void removerPedido(Long id) {
-        if (!pedidoRepository.existsById(id)) {
-            throw new EntityNotFoundException("Pedido não encontrado");
-        }
+    public void cancelarPedido(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
 
-        pedidoItemRepository.deleteAllByPedido_Id(id);
-
-        pedidoRepository.deleteById(id);
+        pedido.setStatus(StatusPedido.CANCELADO);
+        pedidoRepository.save(pedido);
     }
 
     public List<PedidoExportacaoCsvDto> convertePedidosCsv() {

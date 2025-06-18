@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.MesaDto.AtualizarMesaDto;
@@ -49,8 +50,16 @@ public class MesaController {
 
     @Operation(summary = "Listar Mesas", description = "Lista todas as mesas")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesas() {
-        List<ListarMesaDto> mesas = mesaService.listarMesas();
+    public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesas(
+            @RequestParam(required = false) Boolean status) {
+        List<ListarMesaDto> mesas;
+
+        if (status != null) {
+            mesas = mesaService.listarMesasPorStatus(status);
+        } else {
+            mesas = mesaService.listarMesas();
+        }
+
         return ResponseEntity.ok(new ApiResponse<>(mesas));
     }
 
@@ -84,10 +93,17 @@ public class MesaController {
         return ResponseEntity.ok(new ApiResponse<>(mesa));
     }
 
-    @Operation(summary = "Remover Mesa", description = "Remove uma mesa do sistema pelo ID, desde que não tenha reservas associadas")
+    @Operation(summary = "Inativar Mesa", description = "Inativa uma mesa do sistema pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> removerMesa(@PathVariable Long id) {
-        mesaService.removerMesa(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Mesa removida com sucesso."));
+    public ResponseEntity<ApiResponse<String>> inativarMesa(@PathVariable Long id) {
+        mesaService.inativarMesa(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Mesa inativada com sucesso."));
+    }
+
+    @Operation(summary = "Reativar Mesa", description = "Reativa uma mesa do sistema pelo ID")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> reativarMesa(@PathVariable Long id) {
+        mesaService.reativarMesa(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Mesa inativada com sucesso."));
     }
 }

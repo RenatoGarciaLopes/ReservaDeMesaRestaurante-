@@ -16,7 +16,7 @@ import lombok.Data;
 @Table(name = "itens_cardapio")
 @Entity
 public class ItemDeCardapio {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,4 +35,7 @@ public class ItemDeCardapio {
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }

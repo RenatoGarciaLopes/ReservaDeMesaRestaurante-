@@ -32,11 +32,6 @@ public class PedidoMapperHelper {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
 
-        if (reserva.getStatus().equals(StatusReserva.CONCLUIDA)
-                || reserva.getStatus().equals(StatusReserva.CANCELADA)) {
-            throw new IllegalStateException("Uma reserva concluida ou cancelada não pode ser relacionada a um pedido.");
-        }
-
         return reserva;
     }
 

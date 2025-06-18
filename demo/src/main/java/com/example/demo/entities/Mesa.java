@@ -30,4 +30,7 @@ public class Mesa {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusMesa status = StatusMesa.LIVRE;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }

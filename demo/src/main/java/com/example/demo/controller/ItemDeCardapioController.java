@@ -7,11 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ItensDeCardapioDto.AtualizarItemDto;
@@ -47,8 +49,16 @@ public class ItemDeCardapioController {
 
     @Operation(summary = "Listar itens de cardapio", description = "Lista todos os itens no cardapio")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarItensDto>>> listarItens() {
-        List<ListarItensDto> itens = itensService.listarItens();
+    public ResponseEntity<ApiResponse<List<ListarItensDto>>> listarItens(
+            @RequestParam(required = false) Boolean status) {
+        List<ListarItensDto> itens;
+
+        if (status != null) {
+            itens = itensService.listarItensPorStatus(status);
+        } else {
+            itens = itensService.listarItens();
+        }
+
         return ResponseEntity.ok(new ApiResponse<>(itens));
     }
 
@@ -67,11 +77,19 @@ public class ItemDeCardapioController {
         return ResponseEntity.ok(new ApiResponse<>(item));
     }
 
-    @Operation(summary = "Remover item de cardápio", description = "remove um item do cardápio pelo ID")
+    @Operation(summary = "Inativar item de cardápio", description = "Inativa um item do cardápio pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> removerItem(@PathVariable Long id) {
-        itensService.removerItem(id);
+    public ResponseEntity<ApiResponse<String>> inativarItem(@PathVariable Long id) {
+        itensService.inativarItem(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(new ApiResponse<>("Item do cardápio removido com sucesso"));
+                .body(new ApiResponse<>("Item do cardápio inativado com sucesso"));
+    }
+
+    @Operation(summary = "Reativar item de cardápio", description = "Reativa um item do cardápio pelo ID")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> reativarItem(@PathVariable Long id) {
+        itensService.reativarItem(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(new ApiResponse<>("Item do cardápio inativado com sucesso"));
     }
 }

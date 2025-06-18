@@ -78,7 +78,7 @@ public class CategoriaController {
         return ResponseEntity.ok(new ApiResponse<>(categoria));
     }
 
-    @Operation(summary = "Inativa Categoria", description = "Inativa uma categoria")
+    @Operation(summary = "Inativar Categoria", description = "Inativa uma categoria")
     @DeleteMapping("{id}/inativar")
     public ResponseEntity<ApiResponse<String>> inativarCategoria(@PathVariable Long id) {
         categoriaService.inativarCategoria(id);

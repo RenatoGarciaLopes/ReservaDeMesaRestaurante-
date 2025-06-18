@@ -14,7 +14,6 @@ import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.mapper.ItensMapper;
 import com.example.demo.repository.ICategoriaRepository;
 import com.example.demo.repository.IItemDeCardapioRepository;
-import com.example.demo.repository.IPedidoItemRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -25,9 +24,6 @@ public class ItensService {
 
     @Autowired
     private IItemDeCardapioRepository itemRepository;
-
-    @Autowired
-    private IPedidoItemRepository pedidoItemRepository;
 
     @Autowired
     private ICategoriaRepository categoriaRepository;
@@ -42,6 +38,10 @@ public class ItensService {
 
     public List<ListarItensDto> listarItens() {
         return itemMapper.toDtoList(itemRepository.findAll());
+    }
+
+    public List<ListarItensDto> listarItensPorStatus(Boolean status) {
+        return itemMapper.toDtoList(itemRepository.findByAtivo(status));
     }
 
     public ListarItensDto obterItemPeloId(Long id) {
@@ -81,17 +81,23 @@ public class ItensService {
         return itemMapper.toDto(itemRepository.save(item));
     }
 
-    public void removerItem(Long id) {
-        if (!itemRepository.existsById(id)) {
-            throw new EntityNotFoundException("Item não foi encontrado");
+    public void inativarItem(Long id) {
+        ItemDeCardapio item = itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Item não foi encontrado"));
+
+        item.setAtivo(false);
+        itemRepository.save(item);
+    }
+
+    public void reativarItem(Long id) {
+        ItemDeCardapio item = itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Item não foi encontrado"));
+
+        if (item.getAtivo() == true) {
+            throw new IllegalStateException("Item de cardápio já está ativo");
         }
 
-        boolean existe = pedidoItemRepository.existsByItem_Id(id);
-
-        if (existe) {
-            throw new IllegalStateException("O item está associado a um pedido e não pode ser removido.");
-        }
-
-        itemRepository.deleteById(id);
+        item.setAtivo(true);
+        itemRepository.save(item);
     }
 }

@@ -3,9 +3,13 @@ package com.example.demo.entities;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.example.demo.enums.StatusPedido;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,4 +37,8 @@ public class Pedido {
 
     @Column(nullable = false)
     private BigDecimal valorTotal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusPedido status = StatusPedido.REALIZADO;
 }

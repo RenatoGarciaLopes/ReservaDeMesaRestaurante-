@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
+import com.example.demo.entities.Cliente;
 import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Reserva;
 import com.example.demo.enums.StatusMesa;
 import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.ReservaMapper;
+import com.example.demo.repository.IClienteRepository;
 import com.example.demo.repository.IMesaRepository;
 import com.example.demo.repository.IReservaRepository;
 
@@ -35,12 +37,26 @@ public class ReservaService {
     private IMesaRepository mesaRepository;
 
     @Autowired
+    private IClienteRepository clienteRepository;
+
+    @Autowired
     private HorarioFuncionamentoService horarioFuncionamentoService;
 
     @Transactional
     public ListarReservaDto salvar(CadastrarReservaDTO Dto) {
         Mesa mesa = mesaRepository.findById(Dto.getMesaId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não foi encontrado"));
+
+        Cliente cliente = clienteRepository.findById(Dto.getClienteId())
+                .orElseThrow(() -> new EntityNotFoundException("Clinte não foi encontrado"));
+
+        if (!mesa.getAtivo()) {
+            throw new IllegalStateException("Não é possível utilizar uma mesa inativa");
+        }
+
+        if (!cliente.isAtivo()) {
+            throw new IllegalStateException("Cliente está inativado e não pode realizar essa operação.");
+        }
 
         Set<LocalTime> horarios = new HashSet<>(
                 horarioFuncionamentoService.gerarHorariosReserva(Dto.getDataReserva().getDayOfWeek()));
@@ -75,7 +91,7 @@ public class ReservaService {
 
     public ListarReservaDto obterReservaPorId(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
 
         return reservaMapper.toDto(reserva);
     }
@@ -94,7 +110,7 @@ public class ReservaService {
     @Transactional
     public ListarReservaDto confirmarChegadaReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
 
         if (!reserva.getStatus().equals(StatusReserva.CONFIRMADA)) {
             throw new IllegalStateException("Apenas reservas confirmadas podem ser marcadas como ocupadas");
@@ -111,7 +127,7 @@ public class ReservaService {
     @Transactional
     public ListarReservaDto concluirReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
 
         Mesa mesa = reserva.getMesa();
 
@@ -126,13 +142,13 @@ public class ReservaService {
     @Transactional
     public ListarReservaDto cancelarReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não foid encontrada"));
 
         reserva.setStatus(StatusReserva.CANCELADA);
         reservaRepository.save(reserva);
 
         Mesa mesa = mesaRepository.findById(reserva.getMesa().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Mesa não existe"));
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não foi encontrada"));
 
         mesa.setStatus(StatusMesa.LIVRE);
         mesaRepository.save(mesa);

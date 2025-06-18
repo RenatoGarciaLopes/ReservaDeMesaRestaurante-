@@ -46,14 +46,10 @@ public class PedidoController {
     public ResponseEntity<ApiResponse<ListarPedidoDto>> criarPedido(@RequestBody @Valid CadastrarPedidoDto pedidoDto) {
         try {
             ListarPedidoDto savedPedido = pedidoService.salvar(pedidoDto);
-            ApiResponse<ListarPedidoDto> response = new ApiResponse<>(savedPedido);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(savedPedido));
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
-            ApiResponse<ListarPedidoDto> response = new ApiResponse<>(errorResponse);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(errorResponse));
         }
     }
 
@@ -61,9 +57,7 @@ public class PedidoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ListarPedidoDto>>> listarPedidos() {
         List<ListarPedidoDto> pedidosDto = pedidoService.listarPedidos();
-        ApiResponse<List<ListarPedidoDto>> response = new ApiResponse<>(pedidosDto);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
     }
 
     @Operation(summary = "Listar Pedidos por Reserva", description = "Lista os pedidos associados a uma reserva específica")
@@ -71,26 +65,21 @@ public class PedidoController {
     public ResponseEntity<ApiResponse<List<ListarPedidoDto>>> listarPedidoPorReserva(
             @PathVariable Long reservaId) {
         List<ListarPedidoDto> pedidosDto = pedidoService.listarPedidoPorReserva(reservaId);
-        ApiResponse<List<ListarPedidoDto>> response = new ApiResponse<>(pedidosDto);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
     }
 
     @Operation(summary = "Obter Pedido por ID", description = "Obtém os detalhes de um pedido específico por ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarPedidoDto>> obterPedidoPorId(@PathVariable Long id) {
         ListarPedidoDto dto = pedidoService.obterPedidoPorId(id);
-        ApiResponse<ListarPedidoDto> response = new ApiResponse<>(dto);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(dto));
     }
 
-    @Operation(summary = "Remover Pedido", description = "Remove um pedido existente")
+    @Operation(summary = "Cancelar Pedido", description = "Cancela um pedido existente")
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> removerPedido(@PathVariable Long id) {
-        pedidoService.removerPedido(id);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<String>> removerPedido(@PathVariable Long id) {
+        pedidoService.cancelarPedido(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Pedido cancelado com sucesso."));
     }
 
     @Operation(summary = "Exportar pedidos em csv", description = "Exporta pedidos por mesa para arquivo csv")

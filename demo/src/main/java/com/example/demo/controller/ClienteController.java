@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,8 +52,15 @@ public class ClienteController {
 
     @Operation(summary = "Listar cliente", description = "Listar todos os clientes")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarClienteDto>>> listarClientes() {
-        List<ListarClienteDto> cliente = clienteService.listarCliente();
+    public ResponseEntity<ApiResponse<List<ListarClienteDto>>> listarClientes(
+            @RequestParam(required = false) Boolean status) {
+        List<ListarClienteDto> cliente;
+
+        if (status != null) {
+            cliente = clienteService.listarClientePorStatus(status);
+        } else {
+            cliente = clienteService.listarCliente();
+        }
         return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
@@ -78,10 +86,17 @@ public class ClienteController {
         return ResponseEntity.ok(new ApiResponse<>(cliente));
     }
 
-    @Operation(summary = "Remover Cliente", description = "Remove um cliente do sistema pelo ID, desde que não tenha reservas associadas")
+    @Operation(summary = "Inativar Cliente", description = "Inativa um cliente do sistema pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> removerCliente(@PathVariable long id) {
-        clienteService.removerCliente(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Cliente removido com sucesso."));
+    public ResponseEntity<ApiResponse<String>> inativarCliente(@PathVariable long id) {
+        clienteService.inativarCliente(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Cliente inativado com sucesso."));
+    }
+
+    @Operation(summary = "Reativar Cliente", description = "Reativa um cliente do sistema pelo ID")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> reativarCliente(@PathVariable long id) {
+        clienteService.reativarCliente(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Cliente reativado com sucesso."));
     }
 }
