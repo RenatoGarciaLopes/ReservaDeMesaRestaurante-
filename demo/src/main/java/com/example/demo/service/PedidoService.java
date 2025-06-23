@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
@@ -16,6 +17,7 @@ import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.PedidoMapper;
 import com.example.demo.repository.IPedidoItemRepository;
 import com.example.demo.repository.IPedidoRepository;
+import com.example.demo.repository.IReservaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,6 +30,9 @@ public class PedidoService {
 
     @Autowired
     private IPedidoItemRepository pedidoItemRepository;
+
+    @Autowired
+    private IReservaRepository reservaRepository;
 
     @Autowired
     private PedidoMapper pedidoMapper;
@@ -46,8 +51,13 @@ public class PedidoService {
         return pedidoMapper.toDto(pedidoRepository.save(pedido));
     }
 
-    public List<ListarPedidoDto> listarPedidos() {
-        return pedidoMapper.toListDto(pedidoRepository.findAll());
+    public Page<ListarPedidoDto> listarPedidos(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("valorTotal"));
+        Page<ListarPedidoDto> paginaPedidos = pedidoRepository.findAll(pageable).map(pedido -> {
+            ListarPedidoDto dto = pedidoMapper.toDto(pedido);
+            return dto;
+        });
+        return paginaPedidos;
     }
 
     public List<ListarPedidoDto> listarPedidoPorReserva(Long id) {

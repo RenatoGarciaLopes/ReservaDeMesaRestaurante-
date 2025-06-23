@@ -1,8 +1,12 @@
 package com.example.demo.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,15 +16,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
+import com.example.demo.enums.StatusReserva;
 import com.example.demo.service.ReservaService;
 import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -47,8 +54,24 @@ public class ReservaController {
 
     @Operation(summary = "Listar Reservas", description = "Lista de todas as Reservas")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarReservaDto>>> listarReservas() {
-        List<ListarReservaDto> reservaDtos = reservaService.listarReserva();
+    public ResponseEntity<ApiResponse<?>> listarReservas(
+            @RequestParam(required = false) LocalDate dataReserva,
+            @Parameter(description = "Horário no formato HH:mm") @RequestParam(required = false) String horarioReserva,
+            @RequestParam(required = false) StatusReserva status,
+            @RequestParam(required = false) Long mesaId,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+
+        LocalTime horarioConvertido = null;
+        if (horarioReserva != null && !horarioReserva.isBlank()) {
+            try {
+                horarioConvertido = LocalTime.parse(horarioReserva);
+            } catch (DateTimeParseException e) {
+                return ResponseEntity.badRequest().body(new ApiResponse<>("Formato inválido para horário. Use HH:mm"));
+            }
+        }
+
+        Page<ListarReservaDto> reservaDtos = reservaService.listarReserva(pagina, tamanho, dataReserva, horarioConvertido, status, mesaId);
         return ResponseEntity.ok(new ApiResponse<>(reservaDtos));
     }
 

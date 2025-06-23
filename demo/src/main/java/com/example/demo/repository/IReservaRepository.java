@@ -1,13 +1,12 @@
 package com.example.demo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.entities.Reserva;
 
 @Repository
-public interface IReservaRepository extends JpaRepository<Reserva, Long>{
+public interface IReservaRepository extends JpaRepository<Reserva, Long>, JpaSpecificationExecutor<Reserva> {
 
-    boolean existsByMesa_Id(Long idMesa);  
-    boolean existsByCliente_Id(Long idCliente);
 }

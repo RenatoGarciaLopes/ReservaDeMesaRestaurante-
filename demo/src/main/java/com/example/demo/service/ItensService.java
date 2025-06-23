@@ -1,8 +1,13 @@
 package com.example.demo.service;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,6 +19,7 @@ import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.mapper.ItensMapper;
 import com.example.demo.repository.ICategoriaRepository;
 import com.example.demo.repository.IItemDeCardapioRepository;
+import com.example.demo.repository.specification.ItemSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -36,12 +42,20 @@ public class ItensService {
         return itemMapper.toDto(itemRepository.save(item));
     }
 
-    public List<ListarItensDto> listarItens() {
-        return itemMapper.toDtoList(itemRepository.findAll());
-    }
+    public Page<ListarItensDto> listarItens(int pagina, int tamanho, String nome,  Long categoriaId, Boolean status) {
+        Specification<ItemDeCardapio> specification = Specification.where(ItemSpecification.temNome(nome))
+                .and(ItemSpecification.temCategoria(categoriaId))
+                .and(ItemSpecification.temStatus(status));
 
-    public List<ListarItensDto> listarItensPorStatus(Boolean status) {
-        return itemMapper.toDtoList(itemRepository.findByAtivo(status));
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome").ascending());
+
+        Page<ListarItensDto> paginaDeItens = itemRepository.findAll(specification, pageable)
+                .map(item -> {
+                    ListarItensDto dto = itemMapper.toDto(item);
+                    return dto;
+                });
+
+        return paginaDeItens;
     }
 
     public ListarItensDto obterItemPeloId(Long id) {

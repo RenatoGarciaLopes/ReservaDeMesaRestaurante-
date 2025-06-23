@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,16 +48,14 @@ public class ItemDeCardapioController {
 
     @Operation(summary = "Listar itens de cardapio", description = "Lista todos os itens no cardapio")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarItensDto>>> listarItens(
-            @RequestParam(required = false) Boolean status) {
-        List<ListarItensDto> itens;
-
-        if (status != null) {
-            itens = itensService.listarItensPorStatus(status);
-        } else {
-            itens = itensService.listarItens();
-        }
-
+    public ResponseEntity<ApiResponse<Page<ListarItensDto>>> listarItens(
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+                
+        Page<ListarItensDto> itens = itensService.listarItens(pagina, tamanho, nome, categoriaId, status);
         return ResponseEntity.ok(new ApiResponse<>(itens));
     }
 

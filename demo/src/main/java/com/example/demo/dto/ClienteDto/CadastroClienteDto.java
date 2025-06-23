@@ -27,7 +27,7 @@ public class CadastroClienteDto {
 
     @NotBlank(message = "O telefone é obrigatório")
     @Schema(example = "(XX)XXXXXXXX ou (XX)9XXXXXXXX")
-    @Pattern(regexp = "\\(\\d{2}\\)?:\\d{4,5})\\d{4}", message = "Formato inválido. Use (XX)XXXX-XXXX ou (XX)9XXXX-XXXX")
+    @Pattern(regexp = "\\(\\d{2}\\)\\d{4,5}\\d{4}", message = "Formato inválido. Use (XX)XXXXXXXX ou (XX)9XXXXXXXX")
     private String telefone;
 
     private String observacoes;

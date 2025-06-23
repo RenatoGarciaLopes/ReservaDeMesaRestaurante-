@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.CadastrarReservaDTO;
@@ -20,6 +25,7 @@ import com.example.demo.mapper.ReservaMapper;
 import com.example.demo.repository.IClienteRepository;
 import com.example.demo.repository.IMesaRepository;
 import com.example.demo.repository.IReservaRepository;
+import com.example.demo.repository.specification.ReservaSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -50,13 +56,11 @@ public class ReservaService {
         Cliente cliente = clienteRepository.findById(Dto.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Clinte não foi encontrado"));
 
-        if (!mesa.getAtivo()) {
+        if (!mesa.getAtivo())
             throw new IllegalStateException("Não é possível utilizar uma mesa inativa");
-        }
 
-        if (!cliente.isAtivo()) {
+        if (!cliente.isAtivo())
             throw new IllegalStateException("Cliente está inativado e não pode realizar essa operação.");
-        }
 
         Set<LocalTime> horarios = new HashSet<>(
                 horarioFuncionamentoService.gerarHorariosReserva(Dto.getDataReserva().getDayOfWeek()));
@@ -72,7 +76,7 @@ public class ReservaService {
         boolean e = reservaRepository.findAll().stream()
                 .filter(r -> r.getDataReserva().equals(Dto.getDataReserva()))
                 .filter(r -> r.getHoraReserva().equals(Dto.getHoraReserva()))
-                .filter(r -> r.getMesa().getNumero().equals(mesa.getNumero()))
+                .filter(r -> r.getMesa().getId().equals(mesa.getId()))
                 .anyMatch(r -> r.getStatus() == StatusReserva.CONFIRMADA);
 
         if (e)
@@ -80,7 +84,7 @@ public class ReservaService {
 
         if (mesa.getCapacidade() < Dto.getQuantidadePessoas())
             throw new IllegalStateException(
-                    "A quantidade de pessoas excede a capacidade da mesa selecionada. Selecione outra mesa ou reduza o número de pessoas.");
+                    "A quantidade de pessoas excede a capacidade da mesa selecionada. Selecione outra mesa ou reduza o número de pessoas");
 
         mesa.setStatus(StatusMesa.RESERVADA);
         mesaRepository.save(mesa);
@@ -103,8 +107,22 @@ public class ReservaService {
                 .toList();
     }
 
-    public List<ListarReservaDto> listarReserva() {
-        return reservaMapper.toListDtos(reservaRepository.findAll());
+    public Page<ListarReservaDto> listarReserva(int pagina, int tamanho,
+            LocalDate dataReserva, LocalTime horarioReserva, StatusReserva status, Long mesaId) {
+        Specification<Reserva> spec = Specification.where(ReservaSpecification.temData(dataReserva))
+                .and(ReservaSpecification.temHorario(horarioReserva))
+                .and(ReservaSpecification.temStatus(status))
+                .and(ReservaSpecification.temMesa(mesaId));
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+
+        Page<ListarReservaDto> paginaDtos = reservaRepository.findAll(spec, pageable)
+                .map(reserva -> {
+                    ListarReservaDto dto = reservaMapper.toDto(reserva);
+                    return dto;
+                });
+
+        return paginaDtos;
     }
 
     @Transactional
