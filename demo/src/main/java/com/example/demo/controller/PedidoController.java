@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
 import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
+import com.example.demo.enums.StatusPedido;
 import com.example.demo.service.CsvService;
 import com.example.demo.service.PedidoService;
 import com.example.demo.service.Utils.ApiResponse;
@@ -58,17 +59,21 @@ public class PedidoController {
     @Operation(summary = "Listar Pedidos", description = "Lista todos os pedidos")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ListarPedidoDto>>> listarPedidos(
+            @RequestParam(required = false) StatusPedido status,
+            @RequestParam(required = false) String nomeItem,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "10") int tamanho) {
-        Page<ListarPedidoDto> pedidosDto = pedidoService.listarPedidos(pagina, tamanho);
+        Page<ListarPedidoDto> pedidosDto = pedidoService.listarPedidos(pagina, tamanho, status, nomeItem);
         return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
     }
 
     @Operation(summary = "Listar Pedidos por Reserva", description = "Lista os pedidos associados a uma reserva específica")
     @GetMapping("/reserva/{reservaId}")
-    public ResponseEntity<ApiResponse<List<ListarPedidoDto>>> listarPedidoPorReserva(
+    public ResponseEntity<ApiResponse<Page<ListarPedidoDto>>> listarPedidoPorReserva(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho,
             @PathVariable Long reservaId) {
-        List<ListarPedidoDto> pedidosDto = pedidoService.listarPedidoPorReserva(reservaId);
+        Page<ListarPedidoDto> pedidosDto = pedidoService.listarPedidoPorReserva(pagina, tamanho, reservaId);
         return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
     }
 

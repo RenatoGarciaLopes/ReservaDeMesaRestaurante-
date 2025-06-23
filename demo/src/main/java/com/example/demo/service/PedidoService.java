@@ -1,10 +1,13 @@
 package com.example.demo.service;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
@@ -15,9 +18,9 @@ import com.example.demo.entities.Reserva;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.PedidoMapper;
-import com.example.demo.repository.IPedidoItemRepository;
 import com.example.demo.repository.IPedidoRepository;
 import com.example.demo.repository.IReservaRepository;
+import com.example.demo.repository.specification.PedidoSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,9 +30,6 @@ public class PedidoService {
 
     @Autowired
     private IPedidoRepository pedidoRepository;
-
-    @Autowired
-    private IPedidoItemRepository pedidoItemRepository;
 
     @Autowired
     private IReservaRepository reservaRepository;
@@ -51,20 +51,22 @@ public class PedidoService {
         return pedidoMapper.toDto(pedidoRepository.save(pedido));
     }
 
-    public Page<ListarPedidoDto> listarPedidos(int pagina, int tamanho) {
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("valorTotal"));
-        Page<ListarPedidoDto> paginaPedidos = pedidoRepository.findAll(pageable).map(pedido -> {
-            ListarPedidoDto dto = pedidoMapper.toDto(pedido);
-            return dto;
-        });
-        return paginaPedidos;
+    public Page<ListarPedidoDto> listarPedidos(int pagina, int tamanho,
+            StatusPedido status, String nomeItem) {
+        Specification<Pedido> spec = Specification.where(PedidoSpecification.temStatus(status))
+                .and(PedidoSpecification.temItemDeCardapio(nomeItem));
+
+        Pageable pageable = PageRequest.of(pagina, tamanho,
+                Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
+
+        return pedidoRepository.findAll(spec, pageable).map(pedidoMapper::toDto);
     }
 
-    public List<ListarPedidoDto> listarPedidoPorReserva(Long id) {
-        return pedidoRepository.findAll().stream()
-                .filter(p -> p.getReserva().getId().equals(id))
-                .map(pedidoMapper::toDto)
-                .toList();
+    public Page<ListarPedidoDto> listarPedidoPorReserva(int pagina, int tamanho, Long id) {
+        Pageable pageable = PageRequest.of(pagina, tamanho,
+                Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
+                
+        return pedidoRepository.findByReservaId(id, pageable).map(pedidoMapper::toDto);
     }
 
     public ListarPedidoDto obterPedidoPorId(Long id) {
@@ -84,16 +86,17 @@ public class PedidoService {
     }
 
     public List<PedidoExportacaoCsvDto> convertePedidosCsv() {
-        return listarPedidos().stream()
-                .flatMap(pedido -> pedido.getPedidos().stream().map(item -> new PedidoExportacaoCsvDto(
-                        pedido.getNumeroMesa(),
-                        pedido.getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        pedido.getHoraReserva().format(DateTimeFormatter.ofPattern("HH:mm")),
-                        pedido.getNomeCliente(),
-                        item.getNomeItem(),
+        Stream<PedidoExportacaoCsvDto> pedidos = pedidoRepository.findAll().stream()
+                .flatMap(pedido -> pedido.getPedidoItens().stream().map(item -> new PedidoExportacaoCsvDto(
+                        pedido.getReserva().getMesa().getNumero(),
+                        pedido.getReserva().getDataReserva().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        pedido.getReserva().getHoraReserva().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        pedido.getReserva().getCliente().getNome(),
+                        item.getItem().getNome(),
                         item.getQuantidade(),
-                        item.getSubTotal(),
-                        pedido.getValorTotal())))
-                .toList();
+                        item.getItem().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())),
+                        pedido.getValorTotal())));
+
+        return pedidos.toList();
     }
 }

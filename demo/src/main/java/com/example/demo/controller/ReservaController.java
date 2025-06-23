@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,15 +70,18 @@ public class ReservaController {
             }
         }
 
-        Page<ListarReservaDto> reservaDtos = reservaService.listarReserva(pagina, tamanho, dataReserva, horarioConvertido, status, mesaId);
+        Page<ListarReservaDto> reservaDtos = reservaService.listarReserva(pagina, tamanho,
+                dataReserva, horarioConvertido, status, mesaId);
         return ResponseEntity.ok(new ApiResponse<>(reservaDtos));
     }
 
     @Operation(summary = "Listar Reserva por Cliente", description = "Listar as reservas por clientes")
     @GetMapping("cliente/{clienteId}")
-    public ResponseEntity<ApiResponse<List<ListarReservaDto>>> listarReservaPorCliente(
+    public ResponseEntity<ApiResponse<Page<ListarReservaDto>>> listarReservaPorCliente(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho,
             @PathVariable Long clienteId) {
-        List<ListarReservaDto> reservaDtos = reservaService.listarReservaPorCliente(clienteId);
+        Page<ListarReservaDto> reservaDtos = reservaService.listarReservaPorCliente(pagina, tamanho, clienteId);
         return ResponseEntity.ok(new ApiResponse<>(reservaDtos));
     }
 

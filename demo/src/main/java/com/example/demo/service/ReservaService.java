@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,11 +101,9 @@ public class ReservaService {
         return reservaMapper.toDto(reserva);
     }
 
-    public List<ListarReservaDto> listarReservaPorCliente(Long id) {
-        return reservaRepository.findAll().stream()
-                .filter(r -> r.getCliente().getId().equals(id))
-                .map(reservaMapper::toDto)
-                .toList();
+    public Page<ListarReservaDto> listarReservaPorCliente(int pagina, int tamanho, Long id) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").descending());
+        return reservaRepository.findByClienteId(id, pageable).map(reservaMapper::toDto);
     }
 
     public Page<ListarReservaDto> listarReserva(int pagina, int tamanho,
@@ -114,15 +113,8 @@ public class ReservaService {
                 .and(ReservaSpecification.temStatus(status))
                 .and(ReservaSpecification.temMesa(mesaId));
 
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-
-        Page<ListarReservaDto> paginaDtos = reservaRepository.findAll(spec, pageable)
-                .map(reserva -> {
-                    ListarReservaDto dto = reservaMapper.toDto(reserva);
-                    return dto;
-                });
-
-        return paginaDtos;
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").descending());
+        return reservaRepository.findAll(spec, pageable).map(reservaMapper::toDto);
     }
 
     @Transactional

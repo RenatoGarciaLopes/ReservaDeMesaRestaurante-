@@ -42,20 +42,14 @@ public class ItensService {
         return itemMapper.toDto(itemRepository.save(item));
     }
 
-    public Page<ListarItensDto> listarItens(int pagina, int tamanho, String nome,  Long categoriaId, Boolean status) {
+    public Page<ListarItensDto> listarItens(int pagina, int tamanho,
+            String nome, Long categoriaId, Boolean status) {
         Specification<ItemDeCardapio> specification = Specification.where(ItemSpecification.temNome(nome))
                 .and(ItemSpecification.temCategoria(categoriaId))
                 .and(ItemSpecification.temStatus(status));
 
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome").ascending());
-
-        Page<ListarItensDto> paginaDeItens = itemRepository.findAll(specification, pageable)
-                .map(item -> {
-                    ListarItensDto dto = itemMapper.toDto(item);
-                    return dto;
-                });
-
-        return paginaDeItens;
+        return itemRepository.findAll(specification, pageable).map(itemMapper::toDto);
     }
 
     public ListarItensDto obterItemPeloId(Long id) {
