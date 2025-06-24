@@ -43,12 +43,13 @@ public class ItensService {
     }
 
     public Page<ListarItensDto> listarItens(int pagina, int tamanho,
-            String nome, Long categoriaId, Boolean status) {
+            String nome, Long categoriaId, Boolean status) { 
         Specification<ItemDeCardapio> specification = Specification.where(ItemSpecification.temNome(nome))
                 .and(ItemSpecification.temCategoria(categoriaId))
                 .and(ItemSpecification.temStatus(status));
 
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome").ascending());
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome"));
+
         return itemRepository.findAll(specification, pageable).map(itemMapper::toDto);
     }
 

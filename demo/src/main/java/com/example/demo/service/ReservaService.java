@@ -102,18 +102,20 @@ public class ReservaService {
     }
 
     public Page<ListarReservaDto> listarReservaPorCliente(int pagina, int tamanho, Long id) {
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").descending());
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").and(Sort.by("horaReserva")));
+
         return reservaRepository.findByClienteId(id, pageable).map(reservaMapper::toDto);
     }
 
     public Page<ListarReservaDto> listarReserva(int pagina, int tamanho,
-            LocalDate dataReserva, LocalTime horarioReserva, StatusReserva status, Long mesaId) {
+            LocalDate dataReserva, LocalTime horarioReserva, StatusReserva status, Long mesaId) {   
         Specification<Reserva> spec = Specification.where(ReservaSpecification.temData(dataReserva))
                 .and(ReservaSpecification.temHorario(horarioReserva))
                 .and(ReservaSpecification.temStatus(status))
                 .and(ReservaSpecification.temMesa(mesaId));
 
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").descending());
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").and(Sort.by("horaReserva")));
+        
         return reservaRepository.findAll(spec, pageable).map(reservaMapper::toDto);
     }
 
