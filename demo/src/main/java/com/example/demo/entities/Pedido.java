@@ -29,8 +29,12 @@ public class Pedido {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "id_reserva")
+    @JoinColumn(name = "id_reserva", nullable = false)
     private Reserva reserva;
+
+    @ManyToOne
+    @JoinColumn(name = "funcionario_id", nullable = false)
+    private Funcionario funcionario;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.PERSIST)
     private List<PedidoItem> pedidoItens;

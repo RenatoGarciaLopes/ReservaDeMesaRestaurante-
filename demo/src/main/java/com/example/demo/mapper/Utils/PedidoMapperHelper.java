@@ -9,10 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.dto.PedidoDto.ItemQuantidadeDto;
 import com.example.demo.dto.PedidoDto.ListarItemPedidoDto;
+import com.example.demo.entities.Funcionario;
 import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.entities.PedidoItem;
 import com.example.demo.entities.Reserva;
-import com.example.demo.enums.StatusReserva;
+import com.example.demo.repository.IFuncionarioRepository;
 import com.example.demo.repository.IItemDeCardapioRepository;
 import com.example.demo.repository.IReservaRepository;
 
@@ -22,17 +23,24 @@ import jakarta.persistence.EntityNotFoundException;
 public class PedidoMapperHelper {
 
     @Autowired
-    protected IReservaRepository reservaRepository;
+    private IReservaRepository reservaRepository;
+
+    @Autowired
+    private IFuncionarioRepository funcionarioRepository;
 
     @Autowired
     protected IItemDeCardapioRepository itemDeCardapioRepository;
 
-    @Named("buscaReservaPorId")
-    public Reserva buscaReservaPorId(Long reservaId) {
-        Reserva reserva = reservaRepository.findById(reservaId)
+    @Named("buscaReserva")
+    public Reserva buscaReserva(Long reservaId) {
+        return reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+    }
 
-        return reserva;
+    @Named("BuscarFuncionario")
+    public Funcionario buscarFuncionario(Long id) {
+        return funcionarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado"));
     }
 
     @Named("preparaPedidos")

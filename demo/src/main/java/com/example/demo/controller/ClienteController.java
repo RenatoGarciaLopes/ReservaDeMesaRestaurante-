@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +29,6 @@ import jakarta.validation.Valid;
 @Tag(name = "Clientes", description = "Endpoints para gerenciamento de Cliente")
 @RestController
 @RequestMapping("api/clientes")
-
 public class ClienteController {
 
     @Autowired
@@ -52,19 +50,16 @@ public class ClienteController {
 
     @Operation(summary = "Listar cliente", description = "Listar todos os clientes")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarClienteDto>>> listarClientes(
-            @RequestParam(required = false) Boolean status) {
-        List<ListarClienteDto> cliente;
-
-        if (status != null) {
-            cliente = clienteService.listarClientePorStatus(status);
-        } else {
-            cliente = clienteService.listarCliente();
-        }
-        return ResponseEntity.ok(new ApiResponse<>(cliente));
+    public ResponseEntity<ApiResponse<Page<ListarClienteDto>>> listarClientes(
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String nome,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+        Page<ListarClienteDto> pageDtos = clienteService.listarCliente(pagina, tamanho, nome, status);
+        return ResponseEntity.ok(new ApiResponse<>(pageDtos));
     }
 
-    @Operation(summary = "Obter Cliente por ID", description = "Obtém infotmações de um cliente específico pelo ID")
+    @Operation(summary = "Obter Cliente por ID", description = "Obtém informações de um cliente específico pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ListarClienteDto>> obterClientePeloId(@PathVariable long id) {
         ListarClienteDto cliente = clienteService.obterClientePeloId(id);

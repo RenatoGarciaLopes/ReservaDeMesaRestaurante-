@@ -7,11 +7,8 @@ import com.example.demo.entities.ItemDeCardapio;
 public class ItemSpecification {
 
     public static Specification<ItemDeCardapio> temNome(String nome) {
-        return (root, query, cb) -> {
-            if (nome == null) return null;
-            String nomeFormatado = nome.toLowerCase() + "%";
-            return cb.like(cb.lower(root.get("nome")), nomeFormatado);
-        };
+        return (root, query, cb) -> 
+            nome == null || nome.isBlank() ? null : cb.like(cb.lower(root.get("nome")), "%" + nome.toLowerCase() + "%");
     }
 
     public static Specification<ItemDeCardapio> temCategoria(Long categoriaId) {

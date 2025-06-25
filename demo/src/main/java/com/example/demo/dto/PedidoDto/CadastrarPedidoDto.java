@@ -12,10 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CadastrarPedidoDto {
 
-    @NotNull(message = "ID da reserva é obrigatório")
-    private Long reserva_id;
+    @NotNull(message = "Reserva é obrigatória")
+    private Long reservaId;
+
+    @NotNull(message = "Funcionário é obrigatório")
+    private Long funcionarioId;
 
     @NotNull(message = "Quantidade e ID do item do cardápio é obrigatório")
     private List<ItemQuantidadeDto> pedidos;
-
 }

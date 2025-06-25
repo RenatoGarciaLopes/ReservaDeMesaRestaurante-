@@ -15,7 +15,8 @@ import com.example.demo.mapper.Utils.PedidoMapperHelper;
 @Mapper(componentModel = "spring", uses = PedidoMapperHelper.class)
 public interface PedidoMapper {
 
-    @Mapping(source = "reserva_id", target = "reserva", qualifiedByName = "buscaReservaPorId")
+    @Mapping(source = "reservaId", target = "reserva", qualifiedByName = "buscaReserva")
+    @Mapping(source = "funcionarioId", target = "funcionario", qualifiedByName = "BuscarFuncionario")
     @Mapping(source = "pedidos", target = "pedidoItens", qualifiedByName = "preparaPedidos")
     @Mapping(source = "pedidos", target = "valorTotal", qualifiedByName = "calculaTotal")
     Pedido toEntity(CadastrarPedidoDto pedidoDto);
@@ -24,7 +25,10 @@ public interface PedidoMapper {
     @Mapping(target = "dataReserva", source = "reserva.dataReserva")
     @Mapping(target = "horaReserva", source = "reserva.horaReserva")
     @Mapping(target = "nomeCliente", source = "reserva.cliente.nome")
+    @Mapping(target = "nomeFuncionario", source = "funcionario.nome")
+    @Mapping(target = "cargo", source = "funcionario.cargo")
     @Mapping(source = "pedidoItens", target = "pedidos", qualifiedByName = "convertePedidosDto")
+    @Mapping(target = "observacoes", source = "reserva.cliente.observacoes")
     @Mapping(target = "valorTotal", source = "valorTotal")
     ListarPedidoDto toDto(Pedido pedido);
 

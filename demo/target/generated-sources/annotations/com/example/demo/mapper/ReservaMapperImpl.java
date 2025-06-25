@@ -3,8 +3,10 @@ package com.example.demo.mapper;
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
 import com.example.demo.entities.Cliente;
+import com.example.demo.entities.Funcionario;
 import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Reserva;
+import com.example.demo.enums.Cargo;
 import com.example.demo.mapper.Utils.ReservaMapperHelper;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-24T08:11:42-0300",
+    date = "2025-06-24T19:41:27-0300",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
@@ -33,6 +35,7 @@ public class ReservaMapperImpl implements ReservaMapper {
 
         reserva.setCliente( reservaMapperHelper.buscarCliente( reservaDTO.getClienteId() ) );
         reserva.setMesa( reservaMapperHelper.buscarMesa( reservaDTO.getMesaId() ) );
+        reserva.setFuncionario( reservaMapperHelper.buscarFuncionario( reservaDTO.getFuncionarioId() ) );
         reserva.setDataReserva( reservaDTO.getDataReserva() );
         reserva.setHoraReserva( reservaDTO.getHoraReserva() );
         reserva.setQuantidadePessoas( reservaDTO.getQuantidadePessoas() );
@@ -52,6 +55,8 @@ public class ReservaMapperImpl implements ReservaMapper {
         listarReservaDto.setCpf( reservaClienteCpf( reserva ) );
         listarReservaDto.setTelefone( reservaClienteTelefone( reserva ) );
         listarReservaDto.setNumeroMesa( reservaMesaNumero( reserva ) );
+        listarReservaDto.setNomeFuncionario( reservaFuncionarioNome( reserva ) );
+        listarReservaDto.setCargo( reservaFuncionarioCargo( reserva ) );
         listarReservaDto.setDataReserva( reserva.getDataReserva() );
         listarReservaDto.setHoraReserva( reserva.getHoraReserva() );
         listarReservaDto.setQuantidadePessoas( reserva.getQuantidadePessoas() );
@@ -132,5 +137,35 @@ public class ReservaMapperImpl implements ReservaMapper {
             return null;
         }
         return numero;
+    }
+
+    private String reservaFuncionarioNome(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Funcionario funcionario = reserva.getFuncionario();
+        if ( funcionario == null ) {
+            return null;
+        }
+        String nome = funcionario.getNome();
+        if ( nome == null ) {
+            return null;
+        }
+        return nome;
+    }
+
+    private Cargo reservaFuncionarioCargo(Reserva reserva) {
+        if ( reserva == null ) {
+            return null;
+        }
+        Funcionario funcionario = reserva.getFuncionario();
+        if ( funcionario == null ) {
+            return null;
+        }
+        Cargo cargo = funcionario.getCargo();
+        if ( cargo == null ) {
+            return null;
+        }
+        return cargo;
     }
 }

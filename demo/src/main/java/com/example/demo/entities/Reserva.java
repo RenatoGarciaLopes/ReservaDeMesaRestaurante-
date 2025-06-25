@@ -25,12 +25,16 @@ public class Reserva {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
     @ManyToOne
-    @JoinColumn(name = "id_mesa")
+    @JoinColumn(name = "id_mesa", nullable = false)
     private Mesa mesa;
+
+    @ManyToOne
+    @JoinColumn(name = "funcionario_id", nullable = true)
+    private Funcionario funcionario;
 
     @Column(nullable = false)
     private LocalDate dataReserva;

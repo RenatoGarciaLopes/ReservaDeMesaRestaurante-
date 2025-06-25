@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Getter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CadastrarReservaDTO {
 
     @NotNull(message = "Cliente é obrigatório")
@@ -23,6 +25,8 @@ public class CadastrarReservaDTO {
 
     @NotNull(message = "Mesa é obrigatória")
     private Long mesaId;
+
+    private Long funcionarioId;
 
     @NotNull(message = "Data é obrigatória")
     @FutureOrPresent

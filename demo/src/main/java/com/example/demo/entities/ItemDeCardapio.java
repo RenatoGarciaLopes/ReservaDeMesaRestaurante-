@@ -33,7 +33,7 @@ public class ItemDeCardapio {
     private String imagemUrl;
 
     @ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     @Column(nullable = false)

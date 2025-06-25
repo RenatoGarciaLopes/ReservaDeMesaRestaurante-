@@ -3,8 +3,6 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +16,14 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.CadastrarReservaDTO;
 import com.example.demo.dto.ListarReservaDto;
 import com.example.demo.entities.Cliente;
+import com.example.demo.entities.Funcionario;
 import com.example.demo.entities.Mesa;
 import com.example.demo.entities.Reserva;
 import com.example.demo.enums.StatusMesa;
 import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.ReservaMapper;
 import com.example.demo.repository.IClienteRepository;
+import com.example.demo.repository.IFuncionarioRepository;
 import com.example.demo.repository.IMesaRepository;
 import com.example.demo.repository.IReservaRepository;
 import com.example.demo.repository.specification.ReservaSpecification;
@@ -47,6 +47,9 @@ public class ReservaService {
     private IClienteRepository clienteRepository;
 
     @Autowired
+    private IFuncionarioRepository funcionarioRepository;
+
+    @Autowired
     private HorarioFuncionamentoService horarioFuncionamentoService;
 
     @Transactional
@@ -56,6 +59,16 @@ public class ReservaService {
 
         Cliente cliente = clienteRepository.findById(Dto.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Clinte não foi encontrado"));
+
+        Funcionario funcionario = new Funcionario();
+
+        if (Dto.getFuncionarioId() != null) {
+            funcionario = funcionarioRepository.findById(Dto.getFuncionarioId())
+                    .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+        }
+
+        if (!funcionario.getAtivo())
+            throw new IllegalStateException("Funcionário está inativado e não pode realizar essa operação.");
 
         if (!mesa.getAtivo())
             throw new IllegalStateException("Não é possível utilizar uma mesa inativa");
@@ -108,14 +121,14 @@ public class ReservaService {
     }
 
     public Page<ListarReservaDto> listarReserva(int pagina, int tamanho,
-            LocalDate dataReserva, LocalTime horarioReserva, StatusReserva status, Long mesaId) {   
+            LocalDate dataReserva, LocalTime horarioReserva, StatusReserva status, Long mesaId) {
         Specification<Reserva> spec = Specification.where(ReservaSpecification.temData(dataReserva))
                 .and(ReservaSpecification.temHorario(horarioReserva))
                 .and(ReservaSpecification.temStatus(status))
                 .and(ReservaSpecification.temMesa(mesaId));
 
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataReserva").and(Sort.by("horaReserva")));
-        
+
         return reservaRepository.findAll(spec, pageable).map(reservaMapper::toDto);
     }
 
@@ -154,7 +167,12 @@ public class ReservaService {
     @Transactional
     public ListarReservaDto cancelarReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva não foid encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
+
+        if (!reserva.getStatus().equals(StatusReserva.CONFIRMADA)
+                || reserva.getMesa().getStatus() == StatusMesa.OCUPADO) {
+            throw new IllegalStateException("Apenas reservas confirmadas podem ser marcadas como canceladas");
+        }
 
         reserva.setStatus(StatusReserva.CANCELADA);
         reservaRepository.save(reserva);

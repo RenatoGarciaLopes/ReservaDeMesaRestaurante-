@@ -11,7 +11,8 @@ import jakarta.persistence.criteria.Join;
 public class PedidoSpecification {
 
     public static Specification<Pedido> temStatus(StatusPedido status) {
-        return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
+        return (root, query, cb) -> 
+            status == null ? null : cb.equal(root.get("status"), status);
     }
 
     public static Specification<Pedido> temItemDeCardapio(String nomeItem) {

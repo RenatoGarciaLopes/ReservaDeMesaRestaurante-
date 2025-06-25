@@ -3,8 +3,9 @@ package com.example.demo.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import com.example.demo.dto.ClienteDto.AtualizarClienteDto;
 import com.example.demo.dto.ClienteDto.CadastroClienteDto;
@@ -12,12 +13,11 @@ import com.example.demo.dto.ClienteDto.ListarClienteDto;
 import com.example.demo.entities.Cliente;
 import com.example.demo.mapper.ClienteMapper;
 import com.example.demo.repository.IClienteRepository;
-import com.example.demo.repository.IReservaRepository;
+import com.example.demo.repository.specification.ClienteSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
-@Validated
 @Service
 public class ClienteService {
 
@@ -25,23 +25,22 @@ public class ClienteService {
     private IClienteRepository clienteRepository;
 
     @Autowired
-    private IReservaRepository reservaRepository;
-
-    @Autowired
     private ClienteMapper clienteMapper;
 
     @Transactional
-    public ListarClienteDto salvar(CadastroClienteDto clienteDto) {
-        Cliente cliente = clienteMapper.toEntity(clienteDto);
+    public ListarClienteDto salvar(CadastroClienteDto dto) {
+        dto.setCpf(dto.getCpf().replaceAll("\\D", ""));
+        Cliente cliente = clienteMapper.toEntity(dto);
         return clienteMapper.toDto(clienteRepository.save(cliente));
     }
 
-    public List<ListarClienteDto> listarCliente() {
-        return clienteMapper.toDtoLIst(clienteRepository.findAll());
-    }
+    public Page<ListarClienteDto> listarCliente(int pagina, int tamanho, String nome, Boolean status) {
+        Specification<Cliente> spec = Specification.where(ClienteSpecification.temNome(nome))
+                .and(ClienteSpecification.isAtivo(status));
 
-    public List<ListarClienteDto> listarClientePorStatus(Boolean status) {
-        return clienteMapper.toDtoLIst(clienteRepository.findByAtivo(status));
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+
+        return clienteRepository.findAll(spec, pageable).map(clienteMapper::toDto);
     }
 
     public ListarClienteDto obterClientePeloId(long id) {
@@ -53,7 +52,7 @@ public class ClienteService {
 
     public ListarClienteDto obterClientePeloCpf(String cpf) {
         String cpfLimpo = cpf.replaceAll("\\D", "");
-        Cliente cliente = clienteRepository.findByCpf(cpfLimpo)
+        Cliente cliente = clienteRepository.findByCpfAndAtivoTrue(cpfLimpo)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente não foi encontrado"));
 
         return clienteMapper.toDto(cliente);

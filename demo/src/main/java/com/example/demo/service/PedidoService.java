@@ -39,7 +39,7 @@ public class PedidoService {
 
     @Transactional
     public ListarPedidoDto salvar(CadastrarPedidoDto pedidoDto) {
-        Reserva reserva = reservaRepository.findById(pedidoDto.getReserva_id())
+        Reserva reserva = reservaRepository.findById(pedidoDto.getReservaId())
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
 
         if (reserva.getStatus().equals(StatusReserva.CONCLUIDA)
@@ -65,7 +65,7 @@ public class PedidoService {
     public Page<ListarPedidoDto> listarPedidoPorReserva(int pagina, int tamanho, Long id) {
         Pageable pageable = PageRequest.of(pagina, tamanho,
                 Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
-                
+
         return pedidoRepository.findByReservaId(id, pageable).map(pedidoMapper::toDto);
     }
 

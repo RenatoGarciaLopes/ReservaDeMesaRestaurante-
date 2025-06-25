@@ -18,11 +18,11 @@ public class PedidoItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_pedido")
+    @JoinColumn(name = "id_pedido", nullable = false)
     private Pedido pedido;
 
     @ManyToOne
-    @JoinColumn(name = "id_item")
+    @JoinColumn(name = "id_item", nullable = false)
     private ItemDeCardapio item;
 
     @Column(nullable = false)
