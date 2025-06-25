@@ -13,7 +13,6 @@ import com.example.demo.entities.Mesa;
 import com.example.demo.enums.StatusMesa;
 import com.example.demo.mapper.MesaMapper;
 import com.example.demo.repository.IMesaRepository;
-import com.example.demo.repository.IReservaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,9 +22,6 @@ public class MesaService {
 
     @Autowired
     private IMesaRepository mesaRepository;
-
-    @Autowired
-    private IReservaRepository reservaRepository;
 
     @Autowired
     private MesaMapper mesaMapper;

@@ -49,14 +49,14 @@ public class HorarioFuncionamentoController {
 
     @Operation(summary = "Listar Horários", description = "Lista todos os horários")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarHorarioFuncionamento>>> listarMesas() {
+    public ResponseEntity<ApiResponse<List<ListarHorarioFuncionamento>>> listarHorariosFuncionamento() {
         List<ListarHorarioFuncionamento> horarios = horarioFuncionamentoService.listarHorarios();
         return ResponseEntity.ok(new ApiResponse<>(horarios));
     }
 
     @Operation(summary = "Obter Horário por ID", description = "Obtém informações dos horários de um dia específico pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarHorarioFuncionamento>> obterMesaPeloId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ListarHorarioFuncionamento>> obterHorarioFuncionamentoPeloId(@PathVariable Long id) {
         ListarHorarioFuncionamento horario = horarioFuncionamentoService.obterHorarioPorId(id);
         return ResponseEntity.ok(new ApiResponse<>(horario));
     }
@@ -71,7 +71,7 @@ public class HorarioFuncionamentoController {
 
     @Operation(summary = "Remover Horário de Funcionamento", description = "Remove um dia de funcionamento do sistema pelo ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> removerMesa(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<String>> removerHorarioFuncionamento(@PathVariable Long id) {
         horarioFuncionamentoService.removerHorario(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>("Horário de funcionamento removido com sucesso."));
     }

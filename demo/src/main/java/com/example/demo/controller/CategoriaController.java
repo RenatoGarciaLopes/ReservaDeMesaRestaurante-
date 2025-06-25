@@ -65,7 +65,7 @@ public class CategoriaController {
 
     @Operation(summary = "Obter Categoria por ID", description = "Obtém uma categoria específica pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarCategoriaDto>> obterMesaPeloId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ListarCategoriaDto>> obterCategoriaPeloId(@PathVariable Long id) {
         ListarCategoriaDto categoria = categoriaService.obterCategoriaPeloId(id);
         return ResponseEntity.ok(new ApiResponse<>(categoria));
     }

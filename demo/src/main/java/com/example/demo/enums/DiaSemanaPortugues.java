@@ -7,7 +7,6 @@ import java.util.Locale;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum DiaSemanaPortugues {
-
     SEGUNDA,
     TERCA,
     QUARTA,

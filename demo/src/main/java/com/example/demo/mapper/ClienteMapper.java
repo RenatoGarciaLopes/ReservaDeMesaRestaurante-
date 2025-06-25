@@ -10,7 +10,6 @@ import com.example.demo.dto.ClienteDto.ListarClienteDto;
 import com.example.demo.entities.Cliente;
 
 @Mapper (componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-
 public interface ClienteMapper {
 
     Cliente toEntity(CadastroClienteDto ClienteDto);

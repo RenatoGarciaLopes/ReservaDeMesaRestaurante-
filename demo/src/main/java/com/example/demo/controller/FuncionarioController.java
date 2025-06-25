@@ -35,7 +35,7 @@ public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
 
-    @Operation(summary = "Registrar funcionário", description = "Cadastrar novo funcionário")
+    @Operation(summary = "Registrar funcionário", description = "Cadastrar um novo funcionário")
     @PostMapping
     public ResponseEntity<ApiResponse<ListarFuncionarioDto>> criarFuncionario(
             @RequestBody @Valid CadastrarFuncionarioDto dto) {
@@ -51,7 +51,7 @@ public class FuncionarioController {
 
     @Operation(summary = "Listar funcionários", description = "Listar todos os funcionários")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ListarFuncionarioDto>>> listarClientes(
+    public ResponseEntity<ApiResponse<Page<ListarFuncionarioDto>>> listarFuncionarios(
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Cargo cargo,
@@ -64,7 +64,7 @@ public class FuncionarioController {
 
     @Operation(summary = "Obter funcionários por ID", description = "Obtém informações de um cliente específico pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ListarFuncionarioDto>> obterClientePeloId(@PathVariable long id) {
+    public ResponseEntity<ApiResponse<ListarFuncionarioDto>> obterFuncionarioPeloId(@PathVariable long id) {
         ListarFuncionarioDto func = funcionarioService.obterFuncionarioPeloId(id);
         return ResponseEntity.ok(new ApiResponse<>(func));
     }

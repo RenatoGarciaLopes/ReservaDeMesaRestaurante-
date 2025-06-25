@@ -19,7 +19,7 @@ public class PedidoSpecification {
         return (root, query, cb) -> {
             Join<Pedido, PedidoItem> join = root.join("pedidoItens");
             return nomeItem == null || nomeItem.isBlank() ? null
-                    : cb.like(cb.lower(join.get("item").get("nome")), nomeItem.toLowerCase());
+                    : cb.like(cb.lower(join.get("item").get("nome")), "%" + nomeItem.toLowerCase() + "%");
         };
     }
 }

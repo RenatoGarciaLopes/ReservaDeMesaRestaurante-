@@ -64,7 +64,7 @@ public class ReservaService {
 
         if (Dto.getFuncionarioId() != null) {
             funcionario = funcionarioRepository.findById(Dto.getFuncionarioId())
-                    .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado"));
+                    .orElseThrow(() -> new EntityNotFoundException("Funcionário não foi encontrado"));
         }
 
         if (!funcionario.getAtivo())

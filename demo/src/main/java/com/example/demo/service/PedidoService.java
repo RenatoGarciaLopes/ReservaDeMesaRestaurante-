@@ -44,7 +44,7 @@ public class PedidoService {
 
         if (reserva.getStatus().equals(StatusReserva.CONCLUIDA)
                 || reserva.getStatus().equals(StatusReserva.CANCELADA)) {
-            throw new IllegalStateException("Uma reserva concluida ou cancelada não pode ser relacionada a um pedido.");
+            throw new IllegalStateException("Uma reserva concluída ou cancelada não pode ser relacionada a um pedido.");
         }
 
         Pedido pedido = pedidoMapper.toEntity(pedidoDto);
@@ -71,7 +71,7 @@ public class PedidoService {
 
     public ListarPedidoDto obterPedidoPorId(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não foi encontrado"));
 
         return pedidoMapper.toDto(pedido);
     }
@@ -79,7 +79,7 @@ public class PedidoService {
     @Transactional
     public void cancelarPedido(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido não foi encontrado"));
 
         pedido.setStatus(StatusPedido.CANCELADO);
         pedidoRepository.save(pedido);
