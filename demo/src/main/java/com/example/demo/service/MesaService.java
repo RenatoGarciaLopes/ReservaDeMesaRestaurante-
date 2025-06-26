@@ -3,6 +3,8 @@ package com.example.demo.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.MesaDto.AtualizarMesaDto;
@@ -13,6 +15,7 @@ import com.example.demo.entities.Mesa;
 import com.example.demo.enums.StatusMesa;
 import com.example.demo.mapper.MesaMapper;
 import com.example.demo.repository.IMesaRepository;
+import com.example.demo.repository.specification.MesaSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -32,20 +35,20 @@ public class MesaService {
         return mesaMapper.toDto(mesaRepository.save(mesa));
     }
 
-    public List<ListarMesaDto> listarMesas() {
-        return mesaMapper.toDtoLIst(mesaRepository.findAll());
+    public Page<ListarMesaDto> listarMesas(int pagina, int tamanho,
+            StatusMesa status, Integer capacidade, Boolean ativo) {
+        Specification<Mesa> spec = Specification.where(MesaSpecification.temStatus(status))
+                .and(MesaSpecification.temCapacidade(capacidade))
+                .and(MesaSpecification.isAtivo(ativo));
+
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("capacidade"));
+        return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 
-    public List<ListarMesaDto> listarMesasPorStatus(Boolean status) {
-        return mesaMapper.toDtoLIst(mesaRepository.findByAtivo(status));
-    }
-
-    public List<ListarMesaDto> listarMesasDisponiveis() {
-        List<Mesa> mesasDisponiveis = mesaRepository.findAll().stream()
-                .filter(m -> m.getStatus().equals(StatusMesa.LIVRE))
-                .toList();
-
-        return mesaMapper.toDtoLIst(mesasDisponiveis);
+    public Page<ListarMesaDto> listarMesasDisponiveis(int pagina, int tamanho) {
+        Specification<Mesa> spec = Specification.where(MesaSpecification.temStatus(StatusMesa.LIVRE));
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("capacidade"));
+        return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 
     public ListarMesaDto obterMesaPeloId(Long id) {

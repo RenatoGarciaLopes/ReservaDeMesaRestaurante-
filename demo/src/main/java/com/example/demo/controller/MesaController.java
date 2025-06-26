@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +19,7 @@ import com.example.demo.dto.MesaDto.AtualizarMesaDto;
 import com.example.demo.dto.MesaDto.AtualizarStatusMesaDto;
 import com.example.demo.dto.MesaDto.CadastrarMesaDto;
 import com.example.demo.dto.MesaDto.ListarMesaDto;
+import com.example.demo.enums.StatusMesa;
 import com.example.demo.service.MesaService;
 import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
@@ -50,23 +50,23 @@ public class MesaController {
 
     @Operation(summary = "Listar Mesas", description = "Lista todas as mesas")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesas(
-            @RequestParam(required = false) Boolean status) {
-        List<ListarMesaDto> mesas;
+    public ResponseEntity<ApiResponse<Page<ListarMesaDto>>> listarMesas(
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) Integer capacidade,
+            @RequestParam(required = false) StatusMesa status,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
 
-        if (status != null) {
-            mesas = mesaService.listarMesasPorStatus(status);
-        } else {
-            mesas = mesaService.listarMesas();
-        }
-
+        Page<ListarMesaDto> mesas = mesaService.listarMesas(pagina, tamanho, status, capacidade, ativo);
         return ResponseEntity.ok(new ApiResponse<>(mesas));
     }
 
     @Operation(summary = "Listar Mesas Disponíveis", description = "Lista mesas com status 'Livre'")
     @GetMapping("/disponiveis")
-    public ResponseEntity<ApiResponse<List<ListarMesaDto>>> listarMesasDisponiveis() {
-        List<ListarMesaDto> mesas = mesaService.listarMesasDisponiveis();
+    public ResponseEntity<ApiResponse<Page<ListarMesaDto>>> listarMesasDisponiveis(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+        Page<ListarMesaDto> mesas = mesaService.listarMesasDisponiveis(pagina, tamanho);
         return ResponseEntity.ok(new ApiResponse<>(mesas));
     }
 
