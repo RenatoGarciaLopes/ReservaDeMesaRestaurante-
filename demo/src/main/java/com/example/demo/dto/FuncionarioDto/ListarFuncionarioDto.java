@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ListarFuncionarioDto {
 
+    private Long id;
     private String nome;
     private String cpf;
     private String telefone;

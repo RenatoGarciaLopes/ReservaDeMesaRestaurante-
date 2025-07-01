@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class ListarMesaDto {
-
+    private Long id;
     private Integer numero;
     private Integer capacidade;
     private StatusMesa status;

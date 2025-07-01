@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ListarClienteDto {
-
+    private Long id;
     private String nome;
     private String cpf;
     private String email;
