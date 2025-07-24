@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ListarReservaDto {
-
+    private Long id;
     private String nomeCliente;
     private String cpf;
     private String telefone;

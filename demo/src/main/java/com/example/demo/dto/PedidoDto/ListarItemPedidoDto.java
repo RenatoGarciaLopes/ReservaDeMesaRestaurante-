@@ -15,5 +15,6 @@ public class ListarItemPedidoDto {
     private Integer quantidade;
     private String imagemUrl;
     private String categoria;
+    private BigDecimal valorUnitario;
     private BigDecimal subTotal;
 }

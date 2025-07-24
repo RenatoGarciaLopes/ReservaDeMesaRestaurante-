@@ -3,6 +3,7 @@ package com.example.demo.mapper;
 import com.example.demo.dto.MesaDto.CadastrarMesaDto;
 import com.example.demo.dto.MesaDto.ListarMesaDto;
 import com.example.demo.entities.Mesa;
+import com.example.demo.entities.Reserva;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-26T07:37:15-0300",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
+    date = "2025-07-24T19:07:33-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class MesaMapperImpl implements MesaMapper {
@@ -39,7 +40,12 @@ public class MesaMapperImpl implements MesaMapper {
         ListarMesaDto listarMesaDto = new ListarMesaDto();
 
         listarMesaDto.setCapacidade( mesa.getCapacidade() );
+        listarMesaDto.setId( mesa.getId() );
         listarMesaDto.setNumero( mesa.getNumero() );
+        List<Reserva> list = mesa.getReservas();
+        if ( list != null ) {
+            listarMesaDto.setReservas( new ArrayList<Reserva>( list ) );
+        }
         listarMesaDto.setStatus( mesa.getStatus() );
 
         return listarMesaDto;

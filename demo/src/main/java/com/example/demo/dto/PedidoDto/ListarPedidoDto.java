@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import com.example.demo.enums.Cargo;
+import com.example.demo.enums.StatusPedido;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -17,15 +18,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ListarPedidoDto {
 
+    private Long id;
     private Integer numeroMesa;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataReserva;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime horaReserva;
     private String nomeCliente;
     private String nomeFuncionario;
     private Cargo cargo;
     private List<ListarItemPedidoDto> pedidos;
     private String observacoes;
-    private BigDecimal valorTotal; 
+    private BigDecimal valorTotal;
+    private StatusPedido status; 
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.dto.PedidoDto.ItemQuantidadeDto;
+import com.example.demo.dto.PedidoDto.ItemResumoDto;
 import com.example.demo.dto.PedidoDto.ListarItemPedidoDto;
 import com.example.demo.entities.Funcionario;
 import com.example.demo.entities.ItemDeCardapio;
@@ -80,6 +81,23 @@ public class PedidoMapperHelper {
                     dto.setQuantidade(pedido.getQuantidade());
                     dto.setImagemUrl(pedido.getItem().getImagemUrl());
                     dto.setCategoria(pedido.getItem().getCategoria().getNome());
+                    dto.setValorUnitario(pedido.getItem().getPreco());
+                    dto.setSubTotal(pedido.getItem().getPreco().multiply(BigDecimal.valueOf(pedido.getQuantidade())));
+
+                    return dto;
+                }).toList();
+    }
+
+    @Named("converteItensResumo")
+    public List<ItemResumoDto> converteItensResumo(List<PedidoItem> pedidos) {
+        return pedidos.stream()
+                .map(pedido -> {
+                    ItemResumoDto dto = new ItemResumoDto();
+
+                    dto.setNomeItem(pedido.getItem().getNome());
+                    dto.setQuantidade(pedido.getQuantidade());
+                    dto.setCategoria(pedido.getItem().getCategoria().getNome());
+                    dto.setValorUnitario(pedido.getItem().getPreco());
                     dto.setSubTotal(pedido.getItem().getPreco().multiply(BigDecimal.valueOf(pedido.getQuantidade())));
 
                     return dto;

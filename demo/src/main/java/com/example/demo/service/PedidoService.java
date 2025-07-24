@@ -12,12 +12,16 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
+import com.example.demo.dto.PedidoDto.PedidoDetalhadoDto;
+import com.example.demo.dto.PedidoDto.PedidoResumoDto;
+import com.example.demo.dto.PedidoDto.EstatisticasReservaDto;
 import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
 import com.example.demo.entities.Pedido;
 import com.example.demo.entities.Reserva;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.PedidoMapper;
+import com.example.demo.mapper.PedidoResumoMapper;
 import com.example.demo.repository.IPedidoRepository;
 import com.example.demo.repository.IReservaRepository;
 import com.example.demo.repository.specification.PedidoSpecification;
@@ -36,6 +40,9 @@ public class PedidoService {
 
     @Autowired
     private PedidoMapper pedidoMapper;
+
+    @Autowired
+    private PedidoResumoMapper pedidoResumoMapper;
 
     @Transactional
     public ListarPedidoDto salvar(CadastrarPedidoDto pedidoDto) {
@@ -67,6 +74,54 @@ public class PedidoService {
                 Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
 
         return pedidoRepository.findByReservaId(id, pageable).map(pedidoMapper::toDto);
+    }
+
+    public Page<PedidoResumoDto> listarPedidoResumoPorReserva(int pagina, int tamanho, Long id) {
+        Pageable pageable = PageRequest.of(pagina, tamanho,
+                Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
+
+        return pedidoRepository.findByReservaId(id, pageable).map(pedidoResumoMapper::toResumoDto);
+    }
+
+    public Page<PedidoDetalhadoDto> listarPedidoDetalhadoPorReserva(int pagina, int tamanho, Long id) {
+        Pageable pageable = PageRequest.of(pagina, tamanho,
+                Sort.by("reserva.dataReserva").and(Sort.by("reserva.horaReserva")));
+
+        return pedidoRepository.findByReservaId(id, pageable).map(pedidoResumoMapper::toDetalhadoDto);
+    }
+
+    public EstatisticasReservaDto obterEstatisticasReserva(Long reservaId) {
+        List<Pedido> pedidos = pedidoRepository.findByReservaId(reservaId, Pageable.unpaged()).getContent();
+        
+        if (pedidos.isEmpty()) {
+            throw new EntityNotFoundException("Nenhum pedido encontrado para a reserva");
+        }
+
+        Pedido primeiroPedido = pedidos.get(0);
+        Reserva reserva = primeiroPedido.getReserva();
+
+        EstatisticasReservaDto estatisticas = new EstatisticasReservaDto();
+        estatisticas.setReservaId(reservaId);
+        estatisticas.setNumeroMesa(reserva.getMesa().getNumero());
+        estatisticas.setDataReserva(reserva.getDataReserva());
+        estatisticas.setHoraReserva(reserva.getHoraReserva());
+        estatisticas.setNomeCliente(reserva.getCliente().getNome());
+        estatisticas.setTotalPedidos(pedidos.size());
+        estatisticas.setStatusReserva(reserva.getStatus().toString());
+
+        int totalItens = pedidos.stream()
+                .flatMapToInt(pedido -> pedido.getPedidoItens().stream()
+                        .mapToInt(item -> item.getQuantidade()))
+                .sum();
+
+        BigDecimal valorTotal = pedidos.stream()
+                .map(Pedido::getValorTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        estatisticas.setTotalItens(totalItens);
+        estatisticas.setValorTotal(valorTotal);
+
+        return estatisticas;
     }
 
     public ListarPedidoDto obterPedidoPorId(Long id) {

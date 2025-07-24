@@ -12,10 +12,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
+@Getter
+@Setter
 @Entity
 @Table(name = "reservas")
 public class Reserva {
@@ -30,6 +41,7 @@ public class Reserva {
 
     @ManyToOne
     @JoinColumn(name = "id_mesa", nullable = false)
+    @JsonBackReference
     private Mesa mesa;
 
     @ManyToOne
@@ -46,5 +58,6 @@ public class Reserva {
     private Integer quantidadePessoas;
 
     @Column(nullable = false)
-    private StatusReserva status = StatusReserva.CONFIRMADA;
+    private StatusReserva status = StatusReserva.ATIVA;
+
 }

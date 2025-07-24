@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-26T07:37:15-0300",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
+    date = "2025-07-24T19:07:32-0300",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class ItensMapperImpl implements ItensMapper {
@@ -49,6 +49,7 @@ public class ItensMapperImpl implements ItensMapper {
 
         listarItensDto.setCategoria( itemDeCardapioCategoriaNome( itemDeCardapio ) );
         listarItensDto.setDescricao( itemDeCardapio.getDescricao() );
+        listarItensDto.setId( itemDeCardapio.getId() );
         listarItensDto.setImagemUrl( itemDeCardapio.getImagemUrl() );
         listarItensDto.setNome( itemDeCardapio.getNome() );
         listarItensDto.setPreco( itemDeCardapio.getPreco() );

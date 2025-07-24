@@ -1,7 +1,7 @@
 package com.example.demo.enums;
 
 public enum StatusReserva {
-    CONFIRMADA, 
+    ATIVA, 
     CANCELADA, 
     CONCLUIDA
 }

@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PedidoDto.CadastrarPedidoDto;
 import com.example.demo.dto.PedidoDto.ListarPedidoDto;
+import com.example.demo.dto.PedidoDto.PedidoDetalhadoDto;
+import com.example.demo.dto.PedidoDto.PedidoResumoDto;
+import com.example.demo.dto.PedidoDto.EstatisticasReservaDto;
 import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.service.CsvService;
@@ -75,6 +78,33 @@ public class PedidoController {
             @PathVariable Long reservaId) {
         Page<ListarPedidoDto> pedidosDto = pedidoService.listarPedidoPorReserva(pagina, tamanho, reservaId);
         return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
+    }
+
+    @Operation(summary = "Listar Resumo de Pedidos por Reserva", description = "Lista um resumo limpo dos pedidos associados a uma reserva específica")
+    @GetMapping("/reserva/{reservaId}/resumo")
+    public ResponseEntity<ApiResponse<Page<PedidoResumoDto>>> listarPedidoResumoPorReserva(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho,
+            @PathVariable Long reservaId) {
+        Page<PedidoResumoDto> pedidosDto = pedidoService.listarPedidoResumoPorReserva(pagina, tamanho, reservaId);
+        return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
+    }
+
+    @Operation(summary = "Listar Detalhes de Pedidos por Reserva", description = "Lista os detalhes completos dos pedidos associados a uma reserva específica")
+    @GetMapping("/reserva/{reservaId}/detalhes")
+    public ResponseEntity<ApiResponse<Page<PedidoDetalhadoDto>>> listarPedidoDetalhadoPorReserva(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho,
+            @PathVariable Long reservaId) {
+        Page<PedidoDetalhadoDto> pedidosDto = pedidoService.listarPedidoDetalhadoPorReserva(pagina, tamanho, reservaId);
+        return ResponseEntity.ok(new ApiResponse<>(pedidosDto));
+    }
+
+    @Operation(summary = "Obter Estatísticas da Reserva", description = "Retorna estatísticas resumidas dos pedidos de uma reserva")
+    @GetMapping("/reserva/{reservaId}/estatisticas")
+    public ResponseEntity<ApiResponse<EstatisticasReservaDto>> obterEstatisticasReserva(@PathVariable Long reservaId) {
+        EstatisticasReservaDto estatisticas = pedidoService.obterEstatisticasReserva(reservaId);
+        return ResponseEntity.ok(new ApiResponse<>(estatisticas));
     }
 
     @Operation(summary = "Obter Pedido por ID", description = "Obtém os detalhes de um pedido específico por ID")

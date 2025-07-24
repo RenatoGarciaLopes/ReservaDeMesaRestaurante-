@@ -2,7 +2,9 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +93,7 @@ public class ReservaService {
                 .filter(r -> r.getDataReserva().equals(Dto.getDataReserva()))
                 .filter(r -> r.getHoraReserva().equals(Dto.getHoraReserva()))
                 .filter(r -> r.getMesa().getId().equals(mesa.getId()))
-                .anyMatch(r -> r.getStatus() == StatusReserva.CONFIRMADA);
+                .anyMatch(r -> r.getStatus() == StatusReserva.ATIVA);
 
         if (e)
             throw new IllegalStateException("Horário indisponível: tente outra data ou horário");
@@ -137,8 +139,8 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
 
-        if (!reserva.getStatus().equals(StatusReserva.CONFIRMADA)) {
-            throw new IllegalStateException("Apenas reservas confirmadas podem ser marcadas como ocupadas");
+        if (!reserva.getStatus().equals(StatusReserva.ATIVA)) {
+            throw new IllegalStateException("Apenas reservas ativas podem ser marcadas como ocupadas");
         }
 
         Mesa mesa = reserva.getMesa();
@@ -169,9 +171,9 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva não foi encontrada"));
 
-        if (!reserva.getStatus().equals(StatusReserva.CONFIRMADA)
+        if (!reserva.getStatus().equals(StatusReserva.ATIVA)
                 || reserva.getMesa().getStatus() == StatusMesa.OCUPADO) {
-            throw new IllegalStateException("Apenas reservas confirmadas podem ser marcadas como canceladas");
+            throw new IllegalStateException("Apenas reservas ativas podem ser marcadas como canceladas");
         }
 
         reserva.setStatus(StatusReserva.CANCELADA);
@@ -184,5 +186,53 @@ public class ReservaService {
         mesaRepository.save(mesa);
 
         return reservaMapper.toDto(reserva);
+    }
+
+    @Transactional
+    public boolean isMesaHorarioDisponivel(Long mesaId, LocalDate dataReserva, LocalTime horaReserva) {
+
+        Mesa mesa = mesaRepository.findById(mesaId)
+                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+        if (!mesa.getAtivo()) {
+            return false;
+        }
+
+        Set<LocalTime> horariosFuncionamento = new HashSet<>(
+                horarioFuncionamentoService.gerarHorariosReserva(dataReserva.getDayOfWeek()));
+
+        if (!horariosFuncionamento.contains(horaReserva)) {
+            return false; // Horário fora do expediente
+        }
+
+        if (dataReserva.isEqual(LocalDate.now()) && horaReserva.isBefore(LocalTime.now())) {
+            return false; // Não é possível reservar para um horário que já passou
+        }
+
+        boolean isReserved = reservaRepository.findAll().stream()
+                .filter(r -> r.getDataReserva().equals(dataReserva))
+                .filter(r -> r.getHoraReserva().equals(horaReserva))
+                .filter(r -> r.getMesa().getId().equals(mesaId))
+                .anyMatch(r -> r.getStatus() == StatusReserva.ATIVA);
+
+        return !isReserved; // Retorna true se não houver reserva ATIVA, indicando que está disponível.
+    }
+
+    @Transactional
+    public List<LocalTime> listarHorariosDisponiveisParaMesa(Long mesaId, LocalDate dataConsulta) {
+        List<LocalTime> horariosPossiveisDoDia = new ArrayList<>();
+        try {
+            horariosPossiveisDoDia = horarioFuncionamentoService.gerarHorariosReserva(dataConsulta.getDayOfWeek());
+        } catch (EntityNotFoundException e) {
+            
+            return new ArrayList<>();
+        }
+
+        List<LocalTime> horariosDisponiveis = new ArrayList<>();
+        for (LocalTime hora : horariosPossiveisDoDia) {
+            if (isMesaHorarioDisponivel(mesaId, dataConsulta, hora)) {
+                horariosDisponiveis.add(hora);
+            }
+        }
+        return horariosDisponiveis;
     }
 }

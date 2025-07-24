@@ -30,6 +30,7 @@ public interface PedidoMapper {
     @Mapping(source = "pedidoItens", target = "pedidos", qualifiedByName = "convertePedidosDto")
     @Mapping(target = "observacoes", source = "reserva.cliente.observacoes")
     @Mapping(target = "valorTotal", source = "valorTotal")
+    @Mapping(target = "status", source = "status")
     ListarPedidoDto toDto(Pedido pedido);
 
     List<ListarPedidoDto> toListDto(List<Pedido> pedidos);

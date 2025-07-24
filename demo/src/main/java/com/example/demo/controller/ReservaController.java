@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ import com.example.demo.service.Utils.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @Tag(name = "Reservas", description = "Endpoints para gerenciamento de reservas")
@@ -111,5 +113,22 @@ public class ReservaController {
     public ResponseEntity<ApiResponse<ListarReservaDto>> cancelarReserva(@PathVariable Long id) {
         ListarReservaDto reserva = reservaService.cancelarReserva(id);
         return ResponseEntity.ok(new ApiResponse<>(reserva));
+    }
+
+    @Operation(summary = "Listar horários disponíveis para uma mesa", description = "Retorna uma lista de horários disponíveis para uma mesa específica em uma dada data.")
+    @GetMapping("/disponibilidade")
+    public ResponseEntity<ApiResponse<List<LocalTime>>> listarHorariosDisponiveis(
+            @RequestParam @Parameter(description = "ID da mesa") Long mesaId,
+            @RequestParam @Parameter(description = "Data no formato YYYY-MM-DD") LocalDate dataConsulta) {
+        try {
+            List<LocalTime> horarios = reservaService.listarHorariosDisponiveisParaMesa(mesaId, dataConsulta);
+            return ResponseEntity.ok(new ApiResponse<>(horarios));
+        } catch (EntityNotFoundException e) {
+            ErrorResponse errorResponse = new ErrorResponse("Erro de Entidade", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(errorResponse));
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Erro interno", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(errorResponse));
+        }
     }
 }

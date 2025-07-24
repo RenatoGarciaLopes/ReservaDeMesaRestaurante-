@@ -99,6 +99,10 @@ public class HorarioFuncionamentoService {
         LocalTime inicio = horarioFuncionamento.getHorarioInicio();
         LocalTime fim = horarioFuncionamento.getHorarioFim();
 
+        if (inicio == null || fim == null || !inicio.isBefore(fim)) {
+            throw new IllegalArgumentException("Horário de início e fim inválidos para o dia selecionado.");
+        }
+        
         for (LocalTime hora = inicio; hora.isBefore(fim); hora = hora.plusMinutes(30)) {
             horarios.add(hora);
         }
