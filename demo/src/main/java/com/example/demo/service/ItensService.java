@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.ItensDeCardapioDto.AtualizarItemDto;
 import com.example.demo.dto.ItensDeCardapioDto.CadastrarItensDto;
@@ -22,6 +23,11 @@ import com.example.demo.repository.specification.ItemSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Validated
 @Service
 public class ItensService {
@@ -34,6 +40,23 @@ public class ItensService {
 
     @Autowired
     private ItensMapper itemMapper;
+
+    
+    private final String pastaUpload = System.getProperty("user.dir") + "/uploads/imagens/";
+
+    private String salvarImagemEmDisco(MultipartFile arquivo, Long itemId) throws IOException {
+        Files.createDirectories(Paths.get(pastaUpload));
+        String nomeOriginal = arquivo.getOriginalFilename();
+        String extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf('.'));
+        String nomeArquivo = "imagem-item" + "_" + itemId + extensao;
+        Path caminhoArquivo = Paths.get(pastaUpload, nomeArquivo);
+        arquivo.transferTo(caminhoArquivo.toFile());
+        return "/uploads/imagens/" + nomeArquivo;
+    }
+
+    public String uploadImagem(MultipartFile imagem, Long itemId) throws IOException {
+        return salvarImagemEmDisco(imagem, itemId);
+    }
 
     public ListarItensDto salvar(@Valid CadastrarItensDto itensDto) {
         ItemDeCardapio item = itemMapper.toEntity(itensDto);

@@ -12,4 +12,5 @@ import com.example.demo.entities.Funcionario;
 public interface IFuncionarioRepository extends JpaRepository<Funcionario, Long>, JpaSpecificationExecutor<Funcionario> {
 
     Optional<Funcionario> findByCpfAndAtivoTrue(String cpf);
+    Optional<Funcionario> findByEmail(String email);
 }

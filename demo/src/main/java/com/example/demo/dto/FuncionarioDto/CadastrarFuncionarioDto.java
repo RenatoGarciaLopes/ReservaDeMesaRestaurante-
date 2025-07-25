@@ -31,6 +31,9 @@ public class CadastrarFuncionarioDto {
     @Email
     private String email;
 
+    @NotBlank(message = "Senha é obrigatória")
+    private String senha;
+
     @NotNull(message = "Cargo é obrigatório")
     private Cargo cargo;
 

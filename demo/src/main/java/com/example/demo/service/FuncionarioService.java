@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.example.demo.dto.FuncionarioDto.AtualizarFuncionarioDto;
 import com.example.demo.dto.FuncionarioDto.CadastrarFuncionarioDto;
@@ -30,6 +31,8 @@ public class FuncionarioService {
     public ListarFuncionarioDto salvar(CadastrarFuncionarioDto dto) {
         dto.setCpf(dto.getCpf().replaceAll("\\D", ""));
         Funcionario func = funcionarioMapper.toEntity(dto);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        func.setSenha(encoder.encode(dto.getSenha()));
         return funcionarioMapper.toDto(funcionarioRepository.save(func));
     }
 
@@ -103,5 +106,15 @@ public class FuncionarioService {
 
         func.setAtivo(true);
         funcionarioRepository.save(func);
+    }
+
+    public Funcionario autenticarFuncionario(String email, String senha) {
+        Funcionario funcionario = funcionarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado para o email informado"));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(senha, funcionario.getSenha())) {
+            throw new IllegalArgumentException("Senha inválida");
+        }
+        return funcionario;
     }
 }
