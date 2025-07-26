@@ -31,12 +31,14 @@ public class FuncionarioAuthController {
         try {
             Funcionario funcionario = funcionarioService.autenticarFuncionario(loginDto.getEmail(), loginDto.getSenha());
             String token = jwtUtil.generateToken(funcionario.getEmail());
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("token", token);
+            response.put("id", funcionario.getId());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("erro", e.getMessage());
+            response.put("id", null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }

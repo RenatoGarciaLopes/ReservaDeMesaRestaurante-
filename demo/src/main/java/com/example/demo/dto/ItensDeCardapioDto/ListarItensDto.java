@@ -16,4 +16,6 @@ public class ListarItensDto {
     private BigDecimal preco;
     private String categoria;
     private String imagemUrl;
+    private Boolean ativo;
+
 }

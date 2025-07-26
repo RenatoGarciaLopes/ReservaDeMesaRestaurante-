@@ -30,4 +30,6 @@ public class AtualizarFuncionarioDto {
 
     private BigDecimal salario;
 
+    private String senha;
+
 }

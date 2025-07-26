@@ -117,4 +117,56 @@ public class FuncionarioService {
         }
         return funcionario;
     }
+
+    @Transactional
+    public void alterarSenha(Long id, String senhaAtual, String novaSenha, String confirmarNovaSenha) {
+        Funcionario func = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não foi encontrado"));
+
+        // Verificar se a senha atual está correta
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(senhaAtual, func.getSenha())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        // Verificar se a nova senha e confirmação são iguais
+        if (!novaSenha.equals(confirmarNovaSenha)) {
+            throw new IllegalArgumentException("A nova senha e a confirmação não coincidem");
+        }
+
+        // Verificar se a nova senha é diferente da atual
+        if (encoder.matches(novaSenha, func.getSenha())) {
+            throw new IllegalArgumentException("A nova senha deve ser diferente da senha atual");
+        }
+
+        // Criptografar e salvar a nova senha
+        func.setSenha(encoder.encode(novaSenha));
+        funcionarioRepository.save(func);
+    }
+
+    @Transactional
+    public void alterarMinhaSenha(String email, String senhaAtual, String novaSenha, String confirmarNovaSenha) {
+        Funcionario func = funcionarioRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não foi encontrado"));
+
+        // Verificar se a senha atual está correta
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(senhaAtual, func.getSenha())) {
+            throw new IllegalArgumentException("Senha atual incorreta");
+        }
+
+        // Verificar se a nova senha e confirmação são iguais
+        if (!novaSenha.equals(confirmarNovaSenha)) {
+            throw new IllegalArgumentException("A nova senha e a confirmação não coincidem");
+        }
+
+        // Verificar se a nova senha é diferente da atual
+        if (encoder.matches(novaSenha, func.getSenha())) {
+            throw new IllegalArgumentException("A nova senha deve ser diferente da senha atual");
+        }
+
+        // Criptografar e salvar a nova senha
+        func.setSenha(encoder.encode(novaSenha));
+        funcionarioRepository.save(func);
+    }
 }

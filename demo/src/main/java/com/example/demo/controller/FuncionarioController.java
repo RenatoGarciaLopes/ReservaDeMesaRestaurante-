@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.FuncionarioDto.AlterarSenhaDto;
 import com.example.demo.dto.FuncionarioDto.AtualizarFuncionarioDto;
 import com.example.demo.dto.FuncionarioDto.CadastrarFuncionarioDto;
 import com.example.demo.dto.FuncionarioDto.ListarFuncionarioDto;
@@ -22,6 +23,7 @@ import com.example.demo.enums.Cargo;
 import com.example.demo.service.FuncionarioService;
 import com.example.demo.service.Utils.ApiResponse;
 import com.example.demo.service.Utils.ErrorResponse;
+import jakarta.persistence.EntityNotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -98,5 +100,44 @@ public class FuncionarioController {
         funcionarioService.reativarFuncionario(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(new ApiResponse<>("Funcionário reativado com sucesso."));
+    }
+
+    @Operation(summary = "Alterar minha senha", description = "Altera a senha do funcionário logado")
+    @PatchMapping("/senha")
+    public ResponseEntity<ApiResponse<String>> alterarMinhaSenha(
+            @RequestBody @Valid AlterarSenhaDto dto,
+            @RequestParam String email) {
+        try {
+            funcionarioService.alterarMinhaSenha(email, dto.getSenhaAtual(), dto.getNovaSenha(), dto.getConfirmarNovaSenha());
+            return ResponseEntity.ok(new ApiResponse<>("Senha alterada com sucesso."));
+        } catch (IllegalArgumentException e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Erro de validação", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (EntityNotFoundException e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Funcionário não encontrado", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Erro interno", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @Operation(summary = "Alterar senha do funcionário (ADMIN)", description = "Altera a senha de um funcionário específico (apenas para administradores)")
+    @PatchMapping("/{id}/senha")
+    public ResponseEntity<ApiResponse<String>> alterarSenha(@PathVariable long id,
+            @RequestBody @Valid AlterarSenhaDto dto) {
+        try {
+            funcionarioService.alterarSenha(id, dto.getSenhaAtual(), dto.getNovaSenha(), dto.getConfirmarNovaSenha());
+            return ResponseEntity.ok(new ApiResponse<>("Senha alterada com sucesso."));
+        } catch (IllegalArgumentException e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Erro de validação", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (EntityNotFoundException e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Funcionário não encontrado", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Erro interno", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

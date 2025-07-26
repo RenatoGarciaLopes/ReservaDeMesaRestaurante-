@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +33,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Tag(name = "Itens de cardapio", description = "Endpoints de gererenciamento de itens de cardapio")
 @RestController
@@ -39,6 +43,25 @@ public class ItemDeCardapioController {
 
     @Autowired
     private ItensService itensService;
+
+    @Operation(summary = "Servir imagem", description = "Serve uma imagem específica do item")
+    @GetMapping("/imagem/{nomeArquivo}")
+    public ResponseEntity<Resource> servirImagem(@PathVariable String nomeArquivo) {
+        try {
+            Path caminhoArquivo = Paths.get("uploads/imagens/" + nomeArquivo);
+            Resource resource = new UrlResource(caminhoArquivo.toUri());
+            
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @Operation(summary = "Adicionar Item no cardapio", description = "Cadastra um novo item")
     @PostMapping

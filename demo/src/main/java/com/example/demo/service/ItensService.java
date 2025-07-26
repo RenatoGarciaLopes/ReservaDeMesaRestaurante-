@@ -51,7 +51,7 @@ public class ItensService {
         String nomeArquivo = "imagem-item" + "_" + itemId + extensao;
         Path caminhoArquivo = Paths.get(pastaUpload, nomeArquivo);
         arquivo.transferTo(caminhoArquivo.toFile());
-        return "/uploads/imagens/" + nomeArquivo;
+        return nomeArquivo;
     }
 
     public String uploadImagem(MultipartFile imagem, Long itemId) throws IOException {
