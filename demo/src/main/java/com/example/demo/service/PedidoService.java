@@ -18,12 +18,14 @@ import com.example.demo.dto.PedidoDto.EstatisticasReservaDto;
 import com.example.demo.dto.PedidoDto.PedidoExportacaoCsvDto;
 import com.example.demo.entities.Pedido;
 import com.example.demo.entities.Reserva;
+import com.example.demo.entities.ItemDeCardapio;
 import com.example.demo.enums.StatusPedido;
 import com.example.demo.enums.StatusReserva;
 import com.example.demo.mapper.PedidoMapper;
 import com.example.demo.mapper.PedidoResumoMapper;
 import com.example.demo.repository.IPedidoRepository;
 import com.example.demo.repository.IReservaRepository;
+import com.example.demo.repository.IItemDeCardapioRepository;
 import com.example.demo.repository.specification.PedidoSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +39,9 @@ public class PedidoService {
 
     @Autowired
     private IReservaRepository reservaRepository;
+
+    @Autowired
+    private IItemDeCardapioRepository itemDeCardapioRepository;
 
     @Autowired
     private PedidoMapper pedidoMapper;
@@ -53,6 +58,16 @@ public class PedidoService {
                 || reserva.getStatus().equals(StatusReserva.CANCELADA)) {
             throw new IllegalStateException("Uma reserva concluída ou cancelada não pode ser relacionada a um pedido.");
         }
+
+        // Validar se todos os itens do cardápio estão ativos
+        pedidoDto.getPedidos().forEach(itemDto -> {
+            ItemDeCardapio item = itemDeCardapioRepository.findById(itemDto.getItemId())
+                    .orElseThrow(() -> new EntityNotFoundException("Item de cardápio não encontrado"));
+            
+            if (!item.getAtivo()) {
+                throw new IllegalStateException("O item '" + item.getNome() + "' não está disponível no cardápio.");
+            }
+        });
 
         Pedido pedido = pedidoMapper.toEntity(pedidoDto);
         return pedidoMapper.toDto(pedidoRepository.save(pedido));
