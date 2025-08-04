@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,8 @@ public interface IFuncionarioRepository extends JpaRepository<Funcionario, Long>
 
     Optional<Funcionario> findByCpfAndAtivoTrue(String cpf);
     Optional<Funcionario> findByEmail(String email);
+    
+    long countByAtivoTrue();
+    
+    List<Funcionario> findByAtivoTrue();
 }

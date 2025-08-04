@@ -12,4 +12,6 @@ import com.example.demo.entities.Cliente;
 public interface IClienteRepository extends JpaRepository<Cliente, Long>, JpaSpecificationExecutor<Cliente> {
 
     Optional<Cliente> findByCpfAndAtivoTrue(String cpf);
+    
+    long countByAtivoTrue();
 }

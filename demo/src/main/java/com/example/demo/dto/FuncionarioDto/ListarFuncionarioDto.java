@@ -25,6 +25,7 @@ public class ListarFuncionarioDto {
     private BigDecimal salario;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private LocalDate dataContratacao;
+    private String fotoPerfil;
 
     public String getCpf() {
         return FormatUtils.formatarCpf(cpf);

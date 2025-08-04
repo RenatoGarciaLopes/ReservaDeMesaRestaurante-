@@ -55,4 +55,7 @@ public class Funcionario {
 
     @Column
     private Boolean ativo = true;
+
+    @Column
+    private String fotoPerfil;
 }

@@ -2,6 +2,7 @@ package com.example.demo.entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import com.example.demo.enums.StatusReserva;
 
@@ -12,7 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.Getter;
@@ -20,9 +21,6 @@ import lombok.Setter;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @Getter
@@ -60,4 +58,7 @@ public class Reserva {
     @Column(nullable = false)
     private StatusReserva status = StatusReserva.ATIVA;
 
+    @OneToMany(mappedBy = "reserva")
+    @JsonManagedReference
+    private List<Pedido> pedidos;
 }

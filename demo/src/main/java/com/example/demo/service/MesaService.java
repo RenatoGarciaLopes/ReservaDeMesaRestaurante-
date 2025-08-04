@@ -41,13 +41,30 @@ public class MesaService {
                 .and(MesaSpecification.temCapacidade(capacidade))
                 .and(MesaSpecification.isAtivo(ativo));
 
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("capacidade"));
+        Pageable pageable;
+        if (tamanho == 0) {
+            // Se tamanho for 0, lista todos os itens sem paginação
+            pageable = Pageable.unpaged();
+        } else {
+            // Caso contrário, respeita o tamanho indicado
+            pageable = PageRequest.of(pagina, tamanho, Sort.by("numero"));
+        }
+        
         return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 
     public Page<ListarMesaDto> listarMesasDisponiveis(int pagina, int tamanho) {
         Specification<Mesa> spec = Specification.where(MesaSpecification.temStatus(StatusMesa.LIVRE));
-        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("capacidade"));
+        
+        Pageable pageable;
+        if (tamanho == 0) {
+            // Se tamanho for 0, lista todos os itens sem paginação
+            pageable = Pageable.unpaged();
+        } else {
+            // Caso contrário, respeita o tamanho indicado
+            pageable = PageRequest.of(pagina, tamanho, Sort.by("numero"));
+        }
+        
         return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 

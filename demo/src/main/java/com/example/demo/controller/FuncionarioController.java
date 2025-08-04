@@ -13,7 +13,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.example.demo.dto.FuncionarioDto.AlterarSenhaDto;
 import com.example.demo.dto.FuncionarioDto.AtualizarFuncionarioDto;
@@ -26,6 +34,7 @@ import com.example.demo.service.Utils.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -138,6 +147,43 @@ public class FuncionarioController {
         } catch (Exception e) {
             ApiResponse<String> response = new ApiResponse<>(new ErrorResponse("Erro interno", e.getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @Operation(
+        summary = "Upload de foto de perfil para funcionário", 
+        description = "Faz o upload de uma foto de perfil para um funcionário e retorna o nome do arquivo."
+    )
+    @PostMapping(value = "/upload-foto-perfil/{funcionarioId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<String>> uploadFotoPerfil(
+        @PathVariable Long funcionarioId,
+        @Parameter(description = "Arquivo de imagem a ser enviado", required = true)
+        @RequestPart("imagem") MultipartFile imagem) {
+        try {
+            String nomeArquivo = funcionarioService.uploadImagem(imagem, funcionarioId);
+            return ResponseEntity.ok(new ApiResponse<>(nomeArquivo));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(new ErrorResponse("Falha ao salvar imagem", e.getMessage())));
+        }
+    }
+
+    @Operation(summary = "Servir foto de perfil", description = "Serve uma foto de perfil específica do funcionário")
+    @GetMapping("/foto-perfil/{nomeArquivo}")
+    public ResponseEntity<Resource> servirFotoPerfil(@PathVariable String nomeArquivo) {
+        try {
+            Path caminhoArquivo = Paths.get("uploads/funcionarios/" + nomeArquivo);
+            Resource resource = new UrlResource(caminhoArquivo.toUri());
+            
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

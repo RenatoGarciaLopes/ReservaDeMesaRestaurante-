@@ -3,6 +3,8 @@ package com.example.demo.dto.FuncionarioDto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import com.example.demo.enums.Cargo;
 import com.example.demo.validation.CpfValido;
 

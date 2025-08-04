@@ -5,6 +5,11 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.example.demo.dto.FuncionarioDto.AtualizarFuncionarioDto;
 import com.example.demo.dto.FuncionarioDto.CadastrarFuncionarioDto;
@@ -30,6 +35,12 @@ public class FuncionarioService {
     @Transactional
     public ListarFuncionarioDto salvar(CadastrarFuncionarioDto dto) {
         dto.setCpf(dto.getCpf().replaceAll("\\D", ""));
+        
+        // Verificar se o email já existe
+        if (funcionarioRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new IllegalStateException("Email já cadastrado");
+        }
+        
         Funcionario func = funcionarioMapper.toEntity(dto);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         func.setSenha(encoder.encode(dto.getSenha()));
@@ -168,5 +179,32 @@ public class FuncionarioService {
         // Criptografar e salvar a nova senha
         func.setSenha(encoder.encode(novaSenha));
         funcionarioRepository.save(func);
+    }
+
+    private final String pastaUpload = System.getProperty("user.dir") + "/uploads/funcionarios/";
+
+    private String salvarImagemEmDisco(MultipartFile arquivo, Long funcionarioId) throws IOException {
+        Files.createDirectories(Paths.get(pastaUpload));
+        String nomeOriginal = arquivo.getOriginalFilename();
+        String extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf('.'));
+        String nomeArquivo = "foto-perfil-funcionario" + "_" + funcionarioId + extensao;
+        Path caminhoArquivo = Paths.get(pastaUpload, nomeArquivo);
+        arquivo.transferTo(caminhoArquivo.toFile());
+        return nomeArquivo;
+    }
+
+    @Transactional
+    public String uploadImagem(MultipartFile imagem, Long funcionarioId) throws IOException {
+        // Verificar se o funcionário existe
+        Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não foi encontrado"));
+        
+        String nomeArquivo = salvarImagemEmDisco(imagem, funcionarioId);
+        
+        // Atualizar o campo fotoPerfil do funcionário
+        funcionario.setFotoPerfil(nomeArquivo);
+        funcionarioRepository.save(funcionario);
+        
+        return nomeArquivo;
     }
 }

@@ -9,4 +9,5 @@ import com.example.demo.entities.Mesa;
 @Repository
 public interface IMesaRepository extends JpaRepository<Mesa, Long>, JpaSpecificationExecutor<Mesa> {
 
+    long countByAtivoTrue();
 }
