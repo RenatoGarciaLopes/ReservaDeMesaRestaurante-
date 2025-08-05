@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -142,9 +144,9 @@ public class EstatisticasService {
             estatisticas.setMediaPessoasPorReserva(0.0);
         }
 
-        // Faturamento das reservas
-        BigDecimal faturamentoReservas = reservas.stream()
-                .flatMap(r -> r.getPedidos() != null ? r.getPedidos().stream() : java.util.stream.Stream.empty())
+        // Faturamento das reservas - usar query direta para evitar loops
+        BigDecimal faturamentoReservas = pedidoRepository.findByReservaDataReservaBetween(dataInicio, dataFim)
+                .stream()
                 .map(Pedido::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         estatisticas.setFaturamentoReservas(faturamentoReservas);
@@ -232,9 +234,10 @@ public class EstatisticasService {
         DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         return reservas.stream().map(reserva -> {
-            // Calcular totais da reserva
-            List<Pedido> pedidosReserva = reserva.getPedidos() != null ? reserva.getPedidos() : new ArrayList<>();
+            // Buscar pedidos da reserva diretamente
+            List<Pedido> pedidosReserva = pedidoRepository.findByReservaId(reserva.getId(), Pageable.unpaged()).getContent();
             int totalPedidos = pedidosReserva.size();
+            
             int totalItens = pedidosReserva.stream()
                     .flatMapToInt(p -> p.getPedidoItens().stream().mapToInt(item -> item.getQuantidade()))
                     .sum();
@@ -322,8 +325,9 @@ public class EstatisticasService {
                     dto.setReservasCanceladas(reservasDoDia.stream().filter(r -> r.getStatus() == StatusReserva.CANCELADA).count());
                     dto.setReservasConcluidas(reservasDoDia.stream().filter(r -> r.getStatus() == StatusReserva.CONCLUIDA).count());
                     
+                    // Buscar pedidos das reservas do dia diretamente
                     BigDecimal faturamento = reservasDoDia.stream()
-                            .flatMap(r -> r.getPedidos() != null ? r.getPedidos().stream() : java.util.stream.Stream.empty())
+                            .flatMap(r -> pedidoRepository.findByReservaId(r.getId(), Pageable.unpaged()).getContent().stream())
                             .map(Pedido::getValorTotal)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
                     dto.setFaturamento(faturamento);
@@ -349,7 +353,7 @@ public class EstatisticasService {
                 ItemMaisVendidoDto dto = itensMap.getOrDefault(chave, new ItemMaisVendidoDto());
                 
                 dto.setNomeItem(item.getItem().getNome());
-                dto.setCategoria(item.getItem().getCategoria().getNome());
+                dto.setCategoria(item.getItem().getCategoria() != null ? item.getItem().getCategoria().getNome() : "Sem categoria");
                 dto.setPrecoUnitario(item.getItem().getPreco());
                 dto.setQuantidadeVendida(dto.getQuantidadeVendida() != null ? dto.getQuantidadeVendida() + item.getQuantidade() : item.getQuantidade());
                 
@@ -379,7 +383,7 @@ public class EstatisticasService {
 
         pedidos.forEach(pedido -> {
             pedido.getPedidoItens().forEach(item -> {
-                String categoria = item.getItem().getCategoria().getNome();
+                String categoria = item.getItem().getCategoria() != null ? item.getItem().getCategoria().getNome() : "Sem categoria";
                 BigDecimal valor = item.getItem().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade()));
                 faturamentoPorCategoria.merge(categoria, valor, BigDecimal::add);
             });

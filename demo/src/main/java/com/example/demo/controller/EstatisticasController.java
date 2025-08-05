@@ -41,6 +41,12 @@ public class EstatisticasController {
     @Autowired
     private CsvService csvService;
 
+    @Operation(summary = "Teste de Conectividade", description = "Endpoint simples para testar se o sistema está funcionando")
+    @GetMapping("/teste")
+    public ResponseEntity<ApiResponse<String>> teste() {
+        return ResponseEntity.ok(new ApiResponse<>("Sistema de estatísticas funcionando!"));
+    }
+
     @Operation(summary = "Estatísticas Gerais", description = "Retorna estatísticas gerais do restaurante")
     @GetMapping("/gerais")
     public ResponseEntity<ApiResponse<EstatisticasGeraisDto>> obterEstatisticasGerais(

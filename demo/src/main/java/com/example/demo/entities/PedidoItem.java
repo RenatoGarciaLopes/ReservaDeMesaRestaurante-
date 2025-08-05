@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Data
 @Getter
@@ -23,6 +25,7 @@ public class PedidoItem {
 
     @ManyToOne
     @JoinColumn(name = "id_pedido", nullable = false)
+    @JsonBackReference
     private Pedido pedido;
 
     @ManyToOne

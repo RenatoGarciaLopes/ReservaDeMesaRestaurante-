@@ -27,7 +27,8 @@ public class SecurityConfig {
                     "/api/funcionarios/**",
                     "/v3/api-docs/**",
                     "/uploads/imagens/**",
-                    "/api/itens/imagem/**"
+                    "/api/itens/imagem/**",
+                    "/api/estatisticas/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
