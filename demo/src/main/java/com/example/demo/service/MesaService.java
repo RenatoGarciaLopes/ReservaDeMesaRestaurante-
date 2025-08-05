@@ -49,13 +49,13 @@ public class MesaService {
             // Caso contrário, respeita o tamanho indicado
             pageable = PageRequest.of(pagina, tamanho, Sort.by("numero"));
         }
-        
+
         return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 
     public Page<ListarMesaDto> listarMesasDisponiveis(int pagina, int tamanho) {
         Specification<Mesa> spec = Specification.where(MesaSpecification.temStatus(StatusMesa.LIVRE));
-        
+
         Pageable pageable;
         if (tamanho == 0) {
             // Se tamanho for 0, lista todos os itens sem paginação
@@ -64,7 +64,7 @@ public class MesaService {
             // Caso contrário, respeita o tamanho indicado
             pageable = PageRequest.of(pagina, tamanho, Sort.by("numero"));
         }
-        
+
         return mesaRepository.findAll(spec, pageable).map(mesaMapper::toDto);
     }
 
@@ -104,6 +104,10 @@ public class MesaService {
     public void inativarMesa(Long id) {
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+
+        if (mesa.getStatus() != StatusMesa.LIVRE) {
+            throw new RuntimeException("Não é possível inativar uma mesa ocupada ou reservada");
+        }
 
         mesa.setAtivo(false);
         mesaRepository.save(mesa);
