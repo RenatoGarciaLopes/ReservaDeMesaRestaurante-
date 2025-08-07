@@ -19,14 +19,14 @@ import com.example.demo.entities.Reserva;
 public interface IReservaRepository extends JpaRepository<Reserva, Long>, JpaSpecificationExecutor<Reserva> {
 
     Page<Reserva> findByClienteId(Long clienteId, Pageable pageable);
-    
-    List<Reserva> findByDataReservaBetween(LocalDate dataInicio, LocalDate dataFim);
-    
-    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.funcionario = :funcionario AND r.dataReserva BETWEEN :dataInicio AND :dataFim")
-    long countByFuncionarioAndDataReservaBetween(@Param("funcionario") Funcionario funcionario, 
-                                                @Param("dataInicio") LocalDate dataInicio, 
-                                                @Param("dataFim") LocalDate dataFim);
 
-    @Query("SELECT r.horaReserva FROM Reserva r WHERE r.dataReserva = :data AND r.mesa.id = :mesaId")
+    List<Reserva> findByDataReservaBetween(LocalDate dataInicio, LocalDate dataFim);
+
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.funcionario = :funcionario AND r.dataReserva BETWEEN :dataInicio AND :dataFim")
+    long countByFuncionarioAndDataReservaBetween(@Param("funcionario") Funcionario funcionario,
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim);
+
+    @Query("SELECT r.horaReserva FROM Reserva r WHERE r.dataReserva = :data AND r.mesa.id = :mesaId AND r.status <> com.example.demo.enums.StatusReserva.CANCELADA")
     List<LocalTime> findHorariosReservadosPorDataEMesa(@Param("data") LocalDate data, @Param("mesaId") Long mesaId);
 }

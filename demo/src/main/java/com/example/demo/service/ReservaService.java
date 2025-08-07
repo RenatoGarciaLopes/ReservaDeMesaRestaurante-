@@ -188,34 +188,40 @@ public class ReservaService {
         return reservaMapper.toDto(reserva);
     }
 
-    /* @Transactional
-    public boolean isMesaHorarioDisponivel(Long mesaId, LocalDate dataReserva, LocalTime horaReserva) {
-
-        Mesa mesa = mesaRepository.findById(mesaId)
-                .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
-        if (!mesa.getAtivo()) {
-            return false;
-        }
-
-        Set<LocalTime> horariosFuncionamento = new HashSet<>(
-                horarioFuncionamentoService.gerarHorariosReserva(dataReserva.getDayOfWeek()));
-
-        if (!horariosFuncionamento.contains(horaReserva)) {
-            return false; // Horário fora do expediente
-        }
-
-        if (dataReserva.isEqual(LocalDate.now()) && horaReserva.isBefore(LocalTime.now())) {
-            return false; // Não é possível reservar para um horário que já passou
-        }
-
-        boolean isReserved = reservaRepository.findAll().stream()
-                .filter(r -> r.getDataReserva().equals(dataReserva))
-                .filter(r -> r.getHoraReserva().equals(horaReserva))
-                .filter(r -> r.getMesa().getId().equals(mesaId))
-                .anyMatch(r -> r.getStatus() == StatusReserva.ATIVA);
-
-        return !isReserved; // Retorna true se não houver reserva ATIVA, indicando que está disponível.
-    } */
+    /*
+     * @Transactional
+     * public boolean isMesaHorarioDisponivel(Long mesaId, LocalDate dataReserva,
+     * LocalTime horaReserva) {
+     * 
+     * Mesa mesa = mesaRepository.findById(mesaId)
+     * .orElseThrow(() -> new EntityNotFoundException("Mesa não encontrada"));
+     * if (!mesa.getAtivo()) {
+     * return false;
+     * }
+     * 
+     * Set<LocalTime> horariosFuncionamento = new HashSet<>(
+     * horarioFuncionamentoService.gerarHorariosReserva(dataReserva.getDayOfWeek()))
+     * ;
+     * 
+     * if (!horariosFuncionamento.contains(horaReserva)) {
+     * return false; // Horário fora do expediente
+     * }
+     * 
+     * if (dataReserva.isEqual(LocalDate.now()) &&
+     * horaReserva.isBefore(LocalTime.now())) {
+     * return false; // Não é possível reservar para um horário que já passou
+     * }
+     * 
+     * boolean isReserved = reservaRepository.findAll().stream()
+     * .filter(r -> r.getDataReserva().equals(dataReserva))
+     * .filter(r -> r.getHoraReserva().equals(horaReserva))
+     * .filter(r -> r.getMesa().getId().equals(mesaId))
+     * .anyMatch(r -> r.getStatus() == StatusReserva.ATIVA);
+     * 
+     * return !isReserved; // Retorna true se não houver reserva ATIVA, indicando
+     * que está disponível.
+     * }
+     */
 
     @Transactional
     public List<LocalTime> listarHorariosDisponiveisParaMesa(Long mesaId, LocalDate dataConsulta) {
@@ -230,6 +236,11 @@ public class ReservaService {
 
         // Remove todos os horários reservados da lista de horários possíveis
         horariosDisposniveis.removeAll(horariosReservados);
+
+        if (dataConsulta.equals(LocalDate.now())) {
+            LocalTime agora = LocalTime.now();
+            horariosDisposniveis.removeIf(h -> h.isBefore(agora));
+        }
 
         return horariosDisposniveis;
     }
