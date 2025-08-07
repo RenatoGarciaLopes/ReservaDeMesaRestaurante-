@@ -188,7 +188,7 @@ public class ReservaService {
         return reservaMapper.toDto(reserva);
     }
 
-    @Transactional
+    /* @Transactional
     public boolean isMesaHorarioDisponivel(Long mesaId, LocalDate dataReserva, LocalTime horaReserva) {
 
         Mesa mesa = mesaRepository.findById(mesaId)
@@ -215,24 +215,22 @@ public class ReservaService {
                 .anyMatch(r -> r.getStatus() == StatusReserva.ATIVA);
 
         return !isReserved; // Retorna true se não houver reserva ATIVA, indicando que está disponível.
-    }
+    } */
 
     @Transactional
     public List<LocalTime> listarHorariosDisponiveisParaMesa(Long mesaId, LocalDate dataConsulta) {
-        List<LocalTime> horariosPossiveisDoDia = new ArrayList<>();
+        List<LocalTime> horariosDisposniveis = new ArrayList<>();
         try {
-            horariosPossiveisDoDia = horarioFuncionamentoService.gerarHorariosReserva(dataConsulta.getDayOfWeek());
+            horariosDisposniveis = horarioFuncionamentoService.gerarHorariosReserva(dataConsulta.getDayOfWeek());
         } catch (EntityNotFoundException e) {
-            
             return new ArrayList<>();
         }
 
-        List<LocalTime> horariosDisponiveis = new ArrayList<>();
-        for (LocalTime hora : horariosPossiveisDoDia) {
-            if (isMesaHorarioDisponivel(mesaId, dataConsulta, hora)) {
-                horariosDisponiveis.add(hora);
-            }
-        }
-        return horariosDisponiveis;
+        List<LocalTime> horariosReservados = reservaRepository.findHorariosReservadosPorDataEMesa(dataConsulta, mesaId);
+
+        // Remove todos os horários reservados da lista de horários possíveis
+        horariosDisposniveis.removeAll(horariosReservados);
+
+        return horariosDisposniveis;
     }
 }
